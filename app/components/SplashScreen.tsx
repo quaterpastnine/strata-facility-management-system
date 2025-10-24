@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Cloud, CloudRain, Sun, Droplets, Wind, CheckCircle, Sparkles, Zap, Wrench, Calendar, Building2, ArrowRight } from 'lucide-react';
+import { Cloud, CloudRain, Sun, Droplets, Wind, CheckCircle, Sparkles, Zap, Wrench, Calendar, Building2, ArrowRight, Quote } from 'lucide-react';
+import { getQuoteOfTheDay } from '@/lib/quotes';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -11,22 +12,26 @@ interface SplashScreenProps {
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [step, setStep] = useState(0);
   const [countdown, setCountdown] = useState(10);
+  const quote = getQuoteOfTheDay();
 
   useEffect(() => {
     // Step 0: Welcome message with door image (4 seconds)
     const timer1 = setTimeout(() => setStep(1), 4000);
     
-    // Step 1: Weather update (3 seconds)
-    const timer2 = setTimeout(() => setStep(2), 7000);
+    // Step 1: C.S. Lewis Quote (4 seconds)
+    const timer2 = setTimeout(() => setStep(2), 8000);
     
-    // Step 2: Dashboard updates (3 seconds)
-    const timer3 = setTimeout(() => setStep(3), 10000);
+    // Step 2: Weather update (3 seconds)
+    const timer3 = setTimeout(() => setStep(3), 11000);
     
-    // Step 3: Facilities manager note (3 seconds)
-    const timer4 = setTimeout(() => setStep(4), 13000);
+    // Step 3: Dashboard updates (3 seconds)
+    const timer4 = setTimeout(() => setStep(4), 14000);
     
-    // Step 4: Summary grid (0.5 second transition)
-    const timer5 = setTimeout(() => setStep(5), 13500);
+    // Step 4: Facilities manager note (3 seconds)
+    const timer5 = setTimeout(() => setStep(5), 17000);
+    
+    // Step 5: Summary grid (0.5 second transition)
+    const timer6 = setTimeout(() => setStep(6), 17500);
 
     return () => {
       clearTimeout(timer1);
@@ -34,12 +39,13 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       clearTimeout(timer3);
       clearTimeout(timer4);
       clearTimeout(timer5);
+      clearTimeout(timer6);
     };
   }, []);
 
   // Countdown timer for summary screen
   useEffect(() => {
-    if (step === 5) {
+    if (step === 6) {
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -90,7 +96,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                 >
                   <Image
                     src="/111.jpg"
-                    alt="Sarah Johnson"
+                    alt="Willow Legg"
                     width={512}
                     height={512}
                     sizes="(max-width: 640px) 160px, (max-width: 768px) 224px, (max-width: 1024px) 320px, 512px"
@@ -104,7 +110,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                   className="mt-3 sm:mt-4 md:mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-6 rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-yellow-800"
                   style={{ animation: 'slideUp 1s ease-out 0.5s both' }}
                 >
-                  <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-5xl text-center">Unit 111</p>
+                  <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-5xl text-center">Auto Spin Door</p>
                 </div>
               </div>
             </div>
@@ -113,14 +119,46 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
               style={{ animation: 'slideDown 0.8s ease-out 0.8s both' }}
             >
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
-              <span className="text-center">Welcome Back, Sarah!</span>
+              <span className="text-center">Welcome Back, Willow!</span>
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
             </h1>
           </div>
         )}
 
-        {/* Step 1: Weather Update */}
+        {/* Step 1: C.S. Lewis Quote */}
         {step === 1 && (
+          <div 
+            className="text-center transition-all duration-1000"
+            style={{ animation: 'fadeIn 0.8s ease-out' }}
+          >
+            <div className="bg-gradient-to-br from-amber-600/40 to-amber-900/40 backdrop-blur-lg border-4 border-amber-400/50 rounded-3xl p-8 sm:p-12 md:p-16 lg:p-20 shadow-2xl max-w-5xl mx-auto">
+              <div className="flex items-start gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-10">
+                <Quote className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 lg:w-36 lg:h-36 text-amber-300 flex-shrink-0 animate-pulse" />
+                <div className="flex-1 text-left">
+                  <p className="text-white text-xl sm:text-2xl md:text-4xl lg:text-5xl leading-relaxed mb-6 sm:mb-8 md:mb-10 italic font-light">
+                    "{quote}"
+                  </p>
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="h-1 sm:h-2 md:h-3 w-12 sm:w-16 md:w-20 bg-amber-400 rounded-full"></div>
+                    <p className="text-amber-300 text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold">
+                      C.S. Lewis
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mt-8 sm:mt-10 md:mt-12">
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-amber-300 animate-pulse" />
+                <p className="text-amber-200 text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold">
+                  Quote of the Day
+                </p>
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-amber-300 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Weather Update */}
+        {step === 2 && (
           <div 
           className="text-center transition-all duration-1000"
           style={{ animation: 'fadeIn 0.8s ease-out' }}
@@ -159,8 +197,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           </div>
         )}
 
-        {/* Step 2: Dashboard Updates */}
-        {step === 2 && (
+        {/* Step 3: Dashboard Updates */}
+        {step === 3 && (
           <div 
           className="text-center transition-all duration-1000"
           style={{ animation: 'fadeIn 0.8s ease-out' }}
@@ -225,8 +263,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           </div>
         )}
 
-        {/* Step 3: Facilities Manager Note */}
-        {step === 3 && (
+        {/* Step 4: Facilities Manager Note */}
+        {step === 4 && (
           <div 
           className="text-center transition-all duration-1000"
           style={{ animation: 'fadeIn 0.8s ease-out' }}
@@ -242,7 +280,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           
           <div className="bg-white/20 backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-10 lg:p-12">
           <p className="text-sm sm:text-base md:text-2xl lg:text-4xl text-white leading-relaxed">
-          Hi Sarah, great news! The shower issue you reported in your maintenance ticket has been 
+          Hi Willow, great news! The shower issue you reported in your maintenance ticket has been 
           <span className="font-bold text-green-200"> completely resolved</span>. 
           Our team replaced the faulty valve and tested everything thoroughly. 
           Everything is working perfectly now. If you have any other concerns, don't hesitate to reach out!
@@ -258,8 +296,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           </div>
         )}
 
-        {/* Step 5: Summary Grid */}
-        {step === 5 && (
+        {/* Step 6: Summary Grid */}
+        {step === 6 && (
           <div 
             className="transition-all duration-1000"
             style={{ animation: 'fadeIn 0.8s ease-out' }}
