@@ -107,10 +107,10 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                 
                 {/* Animated nameplate below */}
                 <div 
-                  className="mt-3 sm:mt-4 md:mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-6 rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-yellow-800"
-                  style={{ animation: 'slideUp 1s ease-out 0.5s both' }}
+                  className="mt-3 sm:mt-4 md:mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-6 rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-yellow-800 animate-spin-door"
+                  style={{ animation: 'slideUp 1s ease-out 0.5s both, spinDoor 3s ease-in-out 2s infinite' }}
                 >
-                  <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-5xl text-center">Auto Spin Door</p>
+                  <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-5xl text-center">🚪 Auto Spin Door 🔄</p>
                 </div>
               </div>
             </div>

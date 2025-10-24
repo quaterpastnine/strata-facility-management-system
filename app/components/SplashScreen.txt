@@ -1,0 +1,137 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Cloud, CloudRain, Sun, Droplets, Wind, CheckCircle, Sparkles, Zap, Wrench, Calendar, Building2, ArrowRight, Quote } from 'lucide-react';
+import { getQuoteOfTheDay } from '@/lib/quotes';
+
+interface SplashScreenProps {
+  onComplete: () => void;
+}
+
+export default function SplashScreen({ onComplete }: SplashScreenProps) {
+  const [step, setStep] = useState(0);
+  const [countdown, setCountdown] = useState(10);
+  const quote = getQuoteOfTheDay();
+
+  useEffect(() => {
+    // Step 0: Welcome message with door image (4 seconds)
+    const timer1 = setTimeout(() => setStep(1), 4000);
+    
+    // Step 1: Rumi Quote (4 seconds)
+    const timer2 = setTimeout(() => setStep(2), 8000);
+    
+    // Step 2: Weather update (3 seconds)
+    const timer3 = setTimeout(() => setStep(3), 11000);
+    
+    // Step 3: Dashboard updates (3 seconds)
+    const timer4 = setTimeout(() => setStep(4), 14000);
+    
+    // Step 4: Facilities manager note (3 seconds)
+    const timer5 = setTimeout(() => setStep(5), 17000);
+    
+    // Step 5: Summary grid (0.5 second transition)
+    const timer6 = setTimeout(() => setStep(6), 17500);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+      clearTimeout(timer5);
+      clearTimeout(timer6);
+    };
+  }, []);
+
+  // Countdown timer for summary screen
+  useEffect(() => {
+    if (step === 6) {
+      const interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setTimeout(() => onComplete(), 500);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [step, onComplete]);
+
+  return (
+    <div 
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 overflow-y-auto ${
+        countdown === 0 ? 'opacity-0' : 'opacity-100'
+      }`}
+      style={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
+      {/* Animated background particles - hidden on mobile for better performance */}
+      <div className="absolute inset-0 overflow-hidden hidden md:block">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full animate-pulse delay-100"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/10 rounded-full animate-pulse delay-200"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-8 w-full py-4 sm:py-6 md:py-8">
+        
+        {/* Step 0: Welcome Message */}
+        {step === 0 && (
+          <div 
+            className="text-center transition-all duration-1000"
+            style={{ animation: 'fadeIn 0.8s ease-out' }}
+          >
+            <div className="flex flex-col items-center justify-center mb-4 sm:mb-6 md:mb-8">
+              {/* Responsive animated image */}
+              <div className="relative animate-[zoomIn_1.5s_ease-out]">
+                {/* Image container with responsive sizing */}
+                <div 
+                  className="w-40 h-40 sm:w-56 sm:h-56 md:w-80 md:h-80 lg:w-[32rem] lg:h-[32rem] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
+                  style={{ animation: 'fadeIn 1s ease-out, floatSlow 3s ease-in-out infinite' }}
+                >
+                  <Image
+                    src="/111.jpg"
+                    alt="Willow Legg"
+                    width={512}
+                    height={512}
+                    sizes="(max-width: 640px) 160px, (max-width: 768px) 224px, (max-width: 1024px) 320px, 512px"
+                    className="w-full h-full object-cover"
+                    priority
+                  />
+                </div>
+                
+                {/* Animated nameplate below */}
+                <div 
+                  className="mt-3 sm:mt-4 md:mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-6 rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-yellow-800 animate-spin-door"
+                  style={{ animation: 'slideUp 1s ease-out 0.5s both, spinDoor 3s ease-in-out 2s infinite' }}
+                >
+                  <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-5xl text-center">🚪 Auto Spin Door 🔄</p>
+                </div>
+              </div>
+            </div>
+            <h1 
+              className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 sm:mb-4 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4"
+              style={{ animation: 'slideDown 0.8s ease-out 0.8s both' }}
+            >
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
+              <span className="text-center">Welcome Back, WILLOW!</span>
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
+            </h1>
+          </div>
+        )}
+
+        {/* Rest of splash screens unchanged... */}
+        {step === 1 && <>Quote screen...</>}
+        {step === 2 && <>Weather screen...</>}
+        {step === 3 && <>Updates screen...</>}
+        {step === 4 && <>Manager message screen...</>}
+        {step === 6 && <>Summary screen...</>}
+      </div>
+    </div>
+  );
+}

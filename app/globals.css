@@ -84,3 +84,15 @@ button, a {
   .safe-left { padding-left: env(safe-area-inset-left); }
   .safe-right { padding-right: env(safe-area-inset-right); }
 }
+
+/* Spinning door animation */
+@keyframes spinDoor {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.animate-spin-door {
+  animation: spinDoor 3s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
