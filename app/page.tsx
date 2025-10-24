@@ -2,59 +2,92 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Building2, Users } from 'lucide-react';
+import { Building2, Users, ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-      <div className="text-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-3 sm:p-6">
+      <div className="text-center max-w-6xl mx-auto w-full">
         {/* Logo */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8 md:mb-10">
           <Image
             src="/logo.png"
             alt="StrataTrac Logo"
             width={300}
             height={120}
             priority
-            className="object-contain mx-auto"
+            className="object-contain mx-auto w-40 h-auto sm:w-56 md:w-72 lg:w-80"
           />
         </div>
 
-        <h1 className="text-4xl font-bold text-white mb-4">Strata Facility Management System</h1>
-        <p className="text-xl text-gray-400 mb-12">Choose your role to continue</p>
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 md:mb-4 px-2">
+          Strata Facility Management
+        </h1>
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 mb-6 sm:mb-8 md:mb-10 px-2">
+          Choose your role to continue
+        </p>
 
-        {/* Role Selection Cards */}
-        <div className="grid grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {/* Role Selection Cards - Mobile: Stack vertically with large touch targets */}
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 w-full max-w-5xl mx-auto px-2">
           
           {/* Resident Portal */}
-          <div 
+          <button
             onClick={() => router.push('/resident')}
-            className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-2xl p-12 shadow-2xl cursor-pointer hover:scale-105 transition-all"
+            className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 transition-all transform w-full text-left"
           >
-            <Users className="w-20 h-20 text-white mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-white mb-3">Resident</h2>
-            <p className="text-white/80 text-lg mb-6">Access your bookings, maintenance requests, and move in/out scheduling</p>
-            <button className="bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-8 rounded-lg text-lg transition-all">
-              Enter Portal
-            </button>
-          </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-white/20 rounded-full p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
+                <Users className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
+              </div>
+              
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
+                Resident
+              </h2>
+              
+              <p className="text-white/90 text-base sm:text-lg md:text-xl mb-5 sm:mb-6 leading-relaxed px-2">
+                Access your bookings, maintenance requests, and move in/out scheduling
+              </p>
+              
+              <div className="flex items-center gap-2 sm:gap-3 bg-white/20 hover:bg-white/30 active:bg-white/40 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 md:px-10 rounded-xl text-base sm:text-lg md:text-xl transition-all">
+                Enter Portal
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+            </div>
+          </button>
 
           {/* Facilities Manager Portal */}
-          <div 
+          <button
             onClick={() => router.push('/facilitiesmanager')}
-            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-12 shadow-2xl cursor-pointer hover:scale-105 transition-all"
+            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 transition-all transform w-full text-left"
           >
-            <Building2 className="w-20 h-20 text-white mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-white mb-3">Facilities Manager</h2>
-            <p className="text-white/80 text-lg mb-6">Manage all bookings, maintenance, users, and facility operations</p>
-            <button className="bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-8 rounded-lg text-lg transition-all">
-              Enter Portal
-            </button>
-          </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-white/20 rounded-full p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
+                <Building2 className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
+              </div>
+              
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
+                Facilities Manager
+              </h2>
+              
+              <p className="text-white/90 text-base sm:text-lg md:text-xl mb-5 sm:mb-6 leading-relaxed px-2">
+                Manage all bookings, maintenance, users, and facility operations
+              </p>
+              
+              <div className="flex items-center gap-2 sm:gap-3 bg-white/20 hover:bg-white/30 active:bg-white/40 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 md:px-10 rounded-xl text-base sm:text-lg md:text-xl transition-all">
+                Enter Portal
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+            </div>
+          </button>
 
         </div>
+
+        {/* Footer text */}
+        <p className="text-gray-500 text-xs sm:text-sm mt-8 sm:mt-10 md:mt-12 px-4">
+          Professional Property Solutions • Powered by BCMTrac
+        </p>
       </div>
     </div>
   );
