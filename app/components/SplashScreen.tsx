@@ -18,7 +18,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
     // Step 0: Welcome message with door image (4 seconds)
     const timer1 = setTimeout(() => setStep(1), 4000);
     
-    // Step 1: C.S. Lewis Quote (4 seconds)
+    // Step 1: Rumi Quote (4 seconds)
     const timer2 = setTimeout(() => setStep(2), 8000);
     
     // Step 2: Weather update (3 seconds)
@@ -119,13 +119,13 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
               style={{ animation: 'slideDown 0.8s ease-out 0.8s both' }}
             >
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
-              <span className="text-center">Welcome Back, Willow!</span>
+              <span className="text-center">Welcome Back, WILLOW!</span>
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
             </h1>
           </div>
         )}
 
-        {/* Step 1: C.S. Lewis Quote */}
+        {/* Step 1: Rumi Quote */}
         {step === 1 && (
           <div 
             className="text-center transition-all duration-1000"
@@ -141,7 +141,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="h-1 sm:h-2 md:h-3 w-12 sm:w-16 md:w-20 bg-amber-400 rounded-full"></div>
                     <p className="text-amber-300 text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold">
-                      C.S. Lewis
+                      Rumi
                     </p>
                   </div>
                 </div>
