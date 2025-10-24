@@ -13,7 +13,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
-    // Step 0: Welcome message with door image (4 seconds - extended)
+    // Step 0: Welcome message with door image (4 seconds)
     const timer1 = setTimeout(() => setStep(1), 4000);
     
     // Step 1: Weather update (3 seconds)
@@ -57,21 +57,22 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 overflow-y-auto ${
         countdown === 0 ? 'opacity-0' : 'opacity-100'
       }`}
       style={{
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Animated background particles - hidden on mobile for better performance */}
+      <div className="absolute inset-0 overflow-hidden hidden md:block">
         <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full animate-pulse"></div>
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full animate-pulse delay-100"></div>
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/10 rounded-full animate-pulse delay-200"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-8 w-full py-4 sm:py-6 md:py-8">
         
         {/* Step 0: Welcome Message */}
         {step === 0 && (
@@ -79,12 +80,12 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             className="text-center transition-all duration-1000"
             style={{ animation: 'fadeIn 0.8s ease-out' }}
           >
-            <div className="flex flex-col items-center justify-center mb-4 md:mb-8">
-              {/* Extra large animated image */}
+            <div className="flex flex-col items-center justify-center mb-4 sm:mb-6 md:mb-8">
+              {/* Responsive animated image */}
               <div className="relative animate-[zoomIn_1.5s_ease-out]">
-                {/* Huge image container with multiple animations */}
+                {/* Image container with responsive sizing */}
                 <div 
-                  className="w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 lg:w-[32rem] lg:h-[32rem] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
+                  className="w-40 h-40 sm:w-56 sm:h-56 md:w-80 md:h-80 lg:w-[32rem] lg:h-[32rem] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
                   style={{ animation: 'fadeIn 1s ease-out, floatSlow 3s ease-in-out infinite' }}
                 >
                   <Image
@@ -92,7 +93,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                     alt="Sarah Johnson"
                     width={512}
                     height={512}
-                    sizes="(max-width: 640px) 192px, (max-width: 768px) 256px, (max-width: 1024px) 384px, 512px"
+                    sizes="(max-width: 640px) 160px, (max-width: 768px) 224px, (max-width: 1024px) 320px, 512px"
                     className="w-full h-full object-cover"
                     priority
                   />
@@ -100,20 +101,20 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                 
                 {/* Animated nameplate below */}
                 <div 
-                  className="mt-4 md:mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 px-6 py-3 md:px-12 md:py-6 rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-yellow-800"
+                  className="mt-3 sm:mt-4 md:mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-6 rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl border-2 md:border-4 border-yellow-800"
                   style={{ animation: 'slideUp 1s ease-out 0.5s both' }}
                 >
-                  <p className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center">Unit 111</p>
+                  <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-5xl text-center">Unit 111</p>
                 </div>
               </div>
             </div>
             <h1 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 flex items-center justify-center gap-2 md:gap-4"
+              className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 sm:mb-4 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4"
               style={{ animation: 'slideDown 0.8s ease-out 0.8s both' }}
             >
-              <Sparkles className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
-              Welcome Back, Sarah!
-              <Sparkles className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
+              <span className="text-center">Welcome Back, Sarah!</span>
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-yellow-300 animate-pulse" />
             </h1>
           </div>
         )}
@@ -124,34 +125,34 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           className="text-center transition-all duration-1000"
           style={{ animation: 'fadeIn 0.8s ease-out' }}
           >
-          <div className="bg-white/20 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-12 lg:p-16 shadow-2xl">
-          <div className="flex items-center justify-center gap-4 md:gap-8 mb-4 md:mb-8">
-          <Sun className="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 text-yellow-300 animate-spin-slow" />
-          <Cloud className="w-14 h-14 md:w-20 md:h-20 lg:w-28 lg:h-28 text-white/80 animate-bounce" />
+          <div className="bg-white/20 backdrop-blur-lg rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-12 lg:p-16 shadow-2xl">
+          <div className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 mb-3 sm:mb-6 md:mb-8">
+          <Sun className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 text-yellow-300 animate-spin-slow" />
+          <Cloud className="w-10 h-10 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-28 lg:h-28 text-white/80 animate-bounce" />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-3 md:mb-6">Today's Weather</h2>
-          <p className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-4 md:mb-8">22°C</p>
-          <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white/90 mb-4 md:mb-6 flex items-center justify-center gap-2 md:gap-4">
-          <Cloud className="w-8 h-8 md:w-10 md:h-10 lg:w-14 lg:h-14 text-white/80" />
-          Partly Cloudy
-          <Sun className="w-8 h-8 md:w-10 md:h-10 lg:w-14 lg:h-14 text-yellow-300" />
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-2 sm:mb-4 md:mb-6">Today's Weather</h2>
+          <p className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-3 sm:mb-6 md:mb-8">22°C</p>
+          <p className="text-lg sm:text-2xl md:text-4xl lg:text-5xl text-white/90 mb-3 sm:mb-4 md:mb-6 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4">
+          <Cloud className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-14 lg:h-14 text-white/80" />
+          <span>Partly Cloudy</span>
+          <Sun className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-14 lg:h-14 text-yellow-300" />
           </p>
           
-          <div className="grid grid-cols-3 gap-4 md:gap-8 mt-6 md:mt-12">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 md:gap-8 mt-4 sm:mt-8 md:mt-12">
           <div className="text-center transform hover:scale-110 transition-transform">
-          <Droplets className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-blue-300 mx-auto mb-2 md:mb-3 animate-bounce" />
-          <p className="text-white text-sm sm:text-lg md:text-2xl lg:text-3xl">Humidity</p>
-          <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">65%</p>
+          <Droplets className="w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-blue-300 mx-auto mb-2 animate-bounce" />
+          <p className="text-white text-xs sm:text-base md:text-2xl lg:text-3xl">Humidity</p>
+          <p className="text-white font-bold text-sm sm:text-xl md:text-3xl lg:text-4xl">65%</p>
           </div>
           <div className="text-center transform hover:scale-110 transition-transform">
-          <Wind className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white/80 mx-auto mb-2 md:mb-3" />
-          <p className="text-white text-sm sm:text-lg md:text-2xl lg:text-3xl">Wind</p>
-          <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">12 km/h</p>
+          <Wind className="w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white/80 mx-auto mb-2" />
+          <p className="text-white text-xs sm:text-base md:text-2xl lg:text-3xl">Wind</p>
+          <p className="text-white font-bold text-sm sm:text-xl md:text-3xl lg:text-4xl">12 km/h</p>
           </div>
           <div className="text-center transform hover:scale-110 transition-transform">
-          <CloudRain className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 text-blue-400 mx-auto mb-2 md:mb-3 animate-pulse" />
-          <p className="text-white text-sm sm:text-lg md:text-2xl lg:text-3xl">Rain</p>
-          <p className="text-white font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">20%</p>
+          <CloudRain className="w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-blue-400 mx-auto mb-2 animate-pulse" />
+          <p className="text-white text-xs sm:text-base md:text-2xl lg:text-3xl">Rain</p>
+          <p className="text-white font-bold text-sm sm:text-xl md:text-3xl lg:text-4xl">20%</p>
           </div>
           </div>
           </div>
@@ -164,58 +165,58 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           className="text-center transition-all duration-1000"
           style={{ animation: 'fadeIn 0.8s ease-out' }}
           >
-          <div className="bg-white/20 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-12 lg:p-16 shadow-2xl">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 md:mb-12 flex items-center justify-center gap-2 md:gap-4">
-          <Sparkles className="w-16 h-16 text-yellow-300 animate-pulse" />
-          What's New
-          <Sparkles className="w-16 h-16 text-yellow-300 animate-pulse" />
+          <div className="bg-white/20 backdrop-blur-lg rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-12 lg:p-16 shadow-2xl">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-4 sm:mb-8 md:mb-12 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4">
+          <Sparkles className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-yellow-300 animate-pulse" />
+          <span>What's New</span>
+          <Sparkles className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-yellow-300 animate-pulse" />
           </h2>
           
-          <div className="space-y-4 md:space-y-8 text-left">
+          <div className="space-y-3 sm:space-y-5 md:space-y-8 text-left">
           <div 
-          className="bg-white/10 rounded-xl md:rounded-2xl p-4 md:p-8 transform transition-all hover:scale-105"
+          className="bg-white/10 rounded-lg sm:rounded-xl md:rounded-2xl p-3 sm:p-5 md:p-8 transform transition-all hover:scale-105"
           style={{ animation: 'slideRight 0.6s ease-out' }}
           >
-          <div className="flex items-start gap-3 md:gap-6">
-          <Calendar className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-blue-400 flex-shrink-0 animate-bounce" />
+          <div className="flex items-start gap-2 sm:gap-4 md:gap-6">
+          <Calendar className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-blue-400 flex-shrink-0 animate-bounce" />
           <div>
-          <p className="text-white font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-3 flex items-center gap-2 md:gap-4">
-          <CheckCircle className="w-6 h-6 md:w-8 md:h-8 lg:w-12 lg:h-12 text-green-300" />
-          New Booking Confirmed
+          <p className="text-white font-bold text-base sm:text-xl md:text-3xl lg:text-4xl mb-1 sm:mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+          <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-12 lg:h-12 text-green-300" />
+          <span>New Booking Confirmed</span>
           </p>
-          <p className="text-white/90 text-base sm:text-lg md:text-2xl lg:text-3xl">Tennis Court 1 - Dec 15, 2024 at 3:00 PM</p>
+          <p className="text-white/90 text-sm sm:text-base md:text-2xl lg:text-3xl">Tennis Court 1 - Dec 15, 2024 at 3:00 PM</p>
           </div>
           </div>
           </div>
 
           <div 
-          className="bg-white/10 rounded-2xl p-8 transform transition-all hover:scale-105"
+          className="bg-white/10 rounded-lg sm:rounded-xl md:rounded-2xl p-3 sm:p-5 md:p-8 transform transition-all hover:scale-105"
           style={{ animation: 'slideRight 0.6s ease-out 0.2s both' }}
           >
-          <div className="flex items-start gap-6">
-          <Wrench className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-teal-400 flex-shrink-0 animate-pulse" />
+          <div className="flex items-start gap-2 sm:gap-4 md:gap-6">
+          <Wrench className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-teal-400 flex-shrink-0 animate-pulse" />
           <div>
-          <p className="text-white font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-3 flex items-center gap-2 md:gap-4">
-          <Zap className="w-6 h-6 md:w-8 md:h-8 lg:w-12 lg:h-12 text-yellow-300" />
-          Maintenance Update
+          <p className="text-white font-bold text-base sm:text-xl md:text-3xl lg:text-4xl mb-1 sm:mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+          <Zap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-12 lg:h-12 text-yellow-300" />
+          <span>Maintenance Update</span>
           </p>
-          <p className="text-white/90 text-base sm:text-lg md:text-2xl lg:text-3xl">AC repair is in progress - Tech #3 assigned</p>
+          <p className="text-white/90 text-sm sm:text-base md:text-2xl lg:text-3xl">AC repair is in progress - Tech #3 assigned</p>
           </div>
           </div>
           </div>
 
           <div 
-          className="bg-white/10 rounded-2xl p-8 transform transition-all hover:scale-105"
+          className="bg-white/10 rounded-lg sm:rounded-xl md:rounded-2xl p-3 sm:p-5 md:p-8 transform transition-all hover:scale-105"
           style={{ animation: 'slideRight 0.6s ease-out 0.4s both' }}
           >
-          <div className="flex items-start gap-6">
-          <Building2 className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-orange-400 flex-shrink-0 animate-bounce" />
+          <div className="flex items-start gap-2 sm:gap-4 md:gap-6">
+          <Building2 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-orange-400 flex-shrink-0 animate-bounce" />
           <div>
-          <p className="text-white font-bold text-4xl mb-3 flex items-center gap-4">
-          <CheckCircle className="w-12 h-12 text-blue-300" />
-          Move Request Approved
+          <p className="text-white font-bold text-base sm:text-xl md:text-3xl lg:text-4xl mb-1 sm:mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+          <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-12 lg:h-12 text-blue-300" />
+          <span>Move Request Approved</span>
           </p>
-          <p className="text-white/90 text-base sm:text-lg md:text-2xl lg:text-3xl">Your elevator booking for Nov 28 is confirmed</p>
+          <p className="text-white/90 text-sm sm:text-base md:text-2xl lg:text-3xl">Your elevator booking for Nov 28 is confirmed</p>
           </div>
           </div>
           </div>
@@ -230,17 +231,17 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           className="text-center transition-all duration-1000"
           style={{ animation: 'fadeIn 0.8s ease-out' }}
           >
-          <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl md:rounded-3xl p-6 md:p-12 lg:p-16 shadow-2xl border-2 md:border-4 border-white/30">
-          <div className="mb-4 md:mb-8">
-          <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full mx-auto flex items-center justify-center mb-4 md:mb-6 shadow-2xl animate-bounce">
-          <Sparkles className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 text-white" />
+          <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-12 lg:p-16 shadow-2xl border-2 md:border-4 border-white/30">
+          <div className="mb-3 sm:mb-6 md:mb-8">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full mx-auto flex items-center justify-center mb-3 sm:mb-4 md:mb-6 shadow-2xl animate-bounce">
+          <Sparkles className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 text-white" />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-3">Message from Facilities Manager</h2>
-          <p className="text-xl sm:text-2xl md:text-3xl text-white/80">John Smith</p>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-1 sm:mb-2 md:mb-3">Message from Facilities Manager</h2>
+          <p className="text-base sm:text-xl md:text-3xl text-white/80">John Smith</p>
           </div>
           
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-10 lg:p-12">
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-4xl text-white leading-relaxed">
+          <div className="bg-white/20 backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-10 lg:p-12">
+          <p className="text-sm sm:text-base md:text-2xl lg:text-4xl text-white leading-relaxed">
           Hi Sarah, great news! The shower issue you reported in your maintenance ticket has been 
           <span className="font-bold text-green-200"> completely resolved</span>. 
           Our team replaced the faulty valve and tested everything thoroughly. 
@@ -248,10 +249,10 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           </p>
           </div>
           
-          <div className="mt-6 md:mt-10 flex items-center justify-center gap-2 md:gap-4">
-          <CheckCircle className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-green-300 animate-pulse" />
-          <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-green-200">Issue Resolved</p>
-          <CheckCircle className="w-16 h-16 text-green-300 animate-pulse" />
+          <div className="mt-4 sm:mt-6 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4">
+          <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-green-300 animate-pulse" />
+          <p className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-green-200">Issue Resolved</p>
+          <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-green-300 animate-pulse" />
           </div>
           </div>
           </div>
@@ -263,120 +264,120 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             className="transition-all duration-1000"
             style={{ animation: 'fadeIn 0.8s ease-out' }}
           >
-            <div className="text-center mb-6 md:mb-12">
+            <div className="text-center mb-4 sm:mb-8 md:mb-12">
               <h2 
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-8xl font-bold text-white mb-4 md:mb-6 flex items-center justify-center gap-2 md:gap-4"
+                className="text-2xl sm:text-3xl md:text-5xl lg:text-8xl font-bold text-white mb-3 sm:mb-4 md:mb-6 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4"
                 style={{ animation: 'zoomIn 0.8s ease-out' }}
               >
-                <Sparkles className="w-8 h-8 md:w-12 md:h-12 lg:w-20 lg:h-20 text-yellow-300 animate-pulse" />
-                Your Daily Summary
-                <Sparkles className="w-20 h-20 text-yellow-300 animate-pulse" />
+                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-20 lg:h-20 text-yellow-300 animate-pulse" />
+                <span className="text-center">Your Daily Summary</span>
+                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-20 lg:h-20 text-yellow-300 animate-pulse" />
               </h2>
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mt-4 md:mt-8">
-                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white/90">Proceeding to dashboard in</p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 mt-3 sm:mt-6 md:mt-8">
+                <p className="text-base sm:text-2xl md:text-4xl lg:text-5xl text-white/90 text-center">Proceeding to dashboard in</p>
                 <div 
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-white/30 rounded-full flex items-center justify-center"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 bg-white/30 rounded-full flex items-center justify-center"
                   style={{ animation: 'pulse 1s ease-in-out infinite' }}
                 >
-                  <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white">{countdown}</span>
+                  <span className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white">{countdown}</span>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 md:gap-8">
               {/* Weather Summary */}
               <div 
-                className="bg-white/20 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-10 lg:p-12 shadow-xl transform hover:scale-105 transition-all"
+                className="bg-white/20 backdrop-blur-lg rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-10 lg:p-12 shadow-xl transform hover:scale-105 transition-all"
                 style={{ animation: 'slideRight 0.6s ease-out' }}
               >
-                <div className="flex items-center gap-4 md:gap-6 mb-4 md:mb-6">
-                  <Sun className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-yellow-300 animate-spin-slow" />
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6">
+                  <Sun className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-yellow-300 animate-spin-slow" />
                   <div>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">Weather</h3>
-                    <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white/90">22°C Partly Cloudy</p>
+                    <h3 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white">Weather</h3>
+                    <p className="text-base sm:text-lg md:text-3xl lg:text-4xl text-white/90">22°C Partly Cloudy</p>
                   </div>
                 </div>
-                <div className="flex gap-3 md:gap-6 mt-4 md:mt-6">
-                  <div className="flex items-center gap-2 md:gap-3">
-                    <Droplets className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 text-blue-300 animate-bounce" />
-                    <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl">65%</span>
+                <div className="flex gap-2 sm:gap-4 md:gap-6 mt-3 sm:mt-4 md:mt-6">
+                  <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+                    <Droplets className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 text-blue-300 animate-bounce" />
+                    <span className="text-white text-sm sm:text-base md:text-2xl lg:text-3xl">65%</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Wind className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 text-white/80" />
-                    <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl">12 km/h</span>
+                  <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+                    <Wind className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 text-white/80" />
+                    <span className="text-white text-sm sm:text-base md:text-2xl lg:text-3xl">12 km/h</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <CloudRain className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 text-blue-400 animate-pulse" />
-                    <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl">20%</span>
+                  <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+                    <CloudRain className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 text-blue-400 animate-pulse" />
+                    <span className="text-white text-sm sm:text-base md:text-2xl lg:text-3xl">20%</span>
                   </div>
                 </div>
               </div>
 
               {/* Booking Summary */}
               <div 
-                className="bg-white/20 backdrop-blur-lg rounded-3xl p-12 shadow-xl transform hover:scale-105 transition-all"
+                className="bg-white/20 backdrop-blur-lg rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-10 lg:p-12 shadow-xl transform hover:scale-105 transition-all"
                 style={{ animation: 'slideRight 0.6s ease-out 0.2s both' }}
               >
-                <div className="flex items-center gap-6 mb-6">
-                  <Calendar className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-blue-400 animate-bounce" />
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6">
+                  <Calendar className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-blue-400 animate-bounce" />
                   <div>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">New Booking</h3>
-                    <p className="text-xl sm:text-2xl md:text-3xl text-white/90">Tennis Court 1</p>
+                    <h3 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white">New Booking</h3>
+                    <p className="text-base sm:text-lg md:text-3xl text-white/90">Tennis Court 1</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-green-300 animate-pulse" />
-                  <span className="text-white text-base sm:text-lg md:text-2xl lg:text-3xl">Dec 15, 2024 at 3:00 PM</span>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-green-300 animate-pulse" />
+                  <span className="text-white text-sm sm:text-base md:text-2xl lg:text-3xl">Dec 15, 2024 at 3:00 PM</span>
                 </div>
               </div>
 
               {/* Maintenance Summary */}
               <div 
-                className="bg-white/20 backdrop-blur-lg rounded-3xl p-12 shadow-xl transform hover:scale-105 transition-all"
+                className="bg-white/20 backdrop-blur-lg rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-10 lg:p-12 shadow-xl transform hover:scale-105 transition-all"
                 style={{ animation: 'slideRight 0.6s ease-out 0.4s both' }}
               >
-                <div className="flex items-center gap-6 mb-6">
-                  <Wrench className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-teal-400 animate-pulse" />
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6">
+                  <Wrench className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-teal-400 animate-pulse" />
                   <div>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">Maintenance</h3>
-                    <p className="text-xl sm:text-2xl md:text-3xl text-white/90">AC Repair</p>
+                    <h3 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white">Maintenance</h3>
+                    <p className="text-base sm:text-lg md:text-3xl text-white/90">AC Repair</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Zap className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-yellow-300 animate-bounce" />
-                  <span className="text-white text-base sm:text-lg md:text-2xl lg:text-3xl">In Progress - Tech #3</span>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Zap className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-yellow-300 animate-bounce" />
+                  <span className="text-white text-sm sm:text-base md:text-2xl lg:text-3xl">In Progress - Tech #3</span>
                 </div>
               </div>
 
               {/* Facilities Manager Message */}
               <div 
-                className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-3xl p-12 shadow-xl transform hover:scale-105 transition-all border-4 border-white/30"
+                className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-10 lg:p-12 shadow-xl transform hover:scale-105 transition-all border-2 md:border-4 border-white/30"
                 style={{ animation: 'slideRight 0.6s ease-out 0.6s both' }}
               >
-                <div className="flex items-center gap-6 mb-6">
-                  <div className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center animate-bounce">
-                    <Sparkles className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white" />
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center animate-bounce">
+                    <Sparkles className="w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">Manager Note</h3>
-                    <p className="text-xl sm:text-2xl md:text-3xl text-white/80">John Smith</p>
+                    <h3 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white">Manager Note</h3>
+                    <p className="text-base sm:text-lg md:text-3xl text-white/80">John Smith</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-12 h-12 text-green-300 animate-pulse" />
-                  <span className="text-white text-base sm:text-lg md:text-2xl lg:text-3xl font-semibold">Shower Issue Resolved!</span>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-green-300 animate-pulse" />
+                  <span className="text-white text-sm sm:text-base md:text-2xl lg:text-3xl font-semibold">Shower Issue Resolved!</span>
                 </div>
               </div>
             </div>
 
-            <div className="text-center mt-6 md:mt-12">
+            <div className="text-center mt-4 sm:mt-8 md:mt-12">
               <button
                 onClick={() => onComplete()}
-                className="inline-flex items-center gap-3 md:gap-4 bg-white/30 hover:bg-white/40 text-white font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl px-8 py-4 md:px-16 md:py-6 rounded-full transition-all transform hover:scale-105 shadow-xl"
+                className="inline-flex items-center gap-2 sm:gap-3 md:gap-4 bg-white/30 hover:bg-white/40 text-white font-bold text-base sm:text-xl md:text-3xl lg:text-4xl px-6 py-3 sm:px-12 sm:py-4 md:px-16 md:py-6 rounded-full transition-all transform hover:scale-105 shadow-xl active:scale-95"
                 style={{ animation: 'floatSlow 2s ease-in-out infinite' }}
               >
                 Go to Dashboard
-                <ArrowRight className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
+                <ArrowRight className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
               </button>
             </div>
           </div>
