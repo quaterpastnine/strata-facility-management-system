@@ -27,9 +27,9 @@ export default function ResidentDashboard() {
 
   // Mock data for resident
   const residentData = {
-    name: "Sarah Johnson",
-    unit: "Unit 111",
-    initials: "SJ",
+    name: "Willow Legg",
+    unit: "Auto Spin Door",
+    initials: "WL",
     stats: {
       totalBookings: 12,
       activeMoveRequests: 1,
@@ -174,8 +174,8 @@ export default function ResidentDashboard() {
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">Welcome, Sarah Johnson</h2>
-              <p className="text-white/90 text-base sm:text-lg md:text-xl font-medium">Unit 111</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">Welcome, Willow Legg</h2>
+              <p className="text-white/90 text-base sm:text-lg md:text-xl font-medium">Auto Spin Door</p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-white text-base sm:text-lg md:text-2xl font-semibold">Friday, October 24, 2025 • 10:45 AM</p>
@@ -256,7 +256,7 @@ export default function ResidentDashboard() {
             <div className="space-y-2">
               <div className="bg-white/10 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-sm sm:text-base md:text-lg">Move In - Unit 111</p>
+                  <p className="text-white font-semibold text-sm sm:text-base md:text-lg">Move In - Auto Spin Door</p>
                   <span className="text-xs sm:text-sm text-white/80 bg-green-500/30 px-2 py-1 rounded">Approved</span>
                 </div>
                 <p className="text-white/80 text-xs sm:text-sm md:text-base">Nov 28, 2024 • 9:00 AM</p>
