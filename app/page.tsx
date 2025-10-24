@@ -2,10 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Building2, Users, ArrowRight } from 'lucide-react';
+import { Building2, Users, ArrowRight, Quote } from 'lucide-react';
+import { getQuoteOfTheDay } from '@/lib/quotes';
 
 export default function LandingPage() {
   const router = useRouter();
+  const quote = getQuoteOfTheDay();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-3 sm:p-6">
@@ -28,6 +30,23 @@ export default function LandingPage() {
         <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 mb-6 sm:mb-8 md:mb-10 px-2">
           Choose your role to continue
         </p>
+
+        {/* Quote of the Day - C.S. Lewis */}
+        <div className="mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-4">
+          <div className="bg-gradient-to-br from-amber-600/20 to-amber-800/20 border border-amber-500/30 rounded-xl p-4 sm:p-6 backdrop-blur-sm">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-amber-400 flex-shrink-0 mt-1" />
+              <div className="flex-1 text-left">
+                <p className="text-amber-50 text-sm sm:text-base md:text-lg leading-relaxed mb-2 italic">
+                  "{quote}"
+                </p>
+                <p className="text-amber-400/80 text-xs sm:text-sm font-semibold">
+                  — C.S. Lewis
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Role Selection Cards - Mobile: Stack vertically with large touch targets */}
         <div className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 w-full max-w-5xl mx-auto px-2">
