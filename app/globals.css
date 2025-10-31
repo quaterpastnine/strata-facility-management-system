@@ -21,8 +21,21 @@
   --color-input: #cbd5e1;
   --color-ring: #3b82f6;
   --radius: 0.75rem;
+  
+  /* ===== GLOBAL FONT SIZES ===== */
+  /* Customize these values to change text sizes across the entire app */
+  --font-size-xs: 0.75rem;     /* 12px - Extra small */
+  --font-size-sm: 0.875rem;    /* 14px - Small */
+  --font-size-base: 1rem;      /* 16px - Base/Body */
+  --font-size-lg: 1.125rem;    /* 18px - Large */
+  --font-size-xl: 1.25rem;     /* 20px - Extra large */
+  --font-size-2xl: 1.5rem;     /* 24px - 2X large */
+  --font-size-3xl: 1.875rem;   /* 30px - 3X large */
+  --font-size-4xl: 2.25rem;    /* 36px - 4X large */
+  --font-size-5xl: 3rem;       /* 48px - 5X large */
 }
 
+/* ===== RESPONSIVE BASE RESETS ===== */
 * {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -31,29 +44,48 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Prevent font boosting on mobile */
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  text-size-adjust: none;
+  /* Global base font size - change this to scale all text */
+  font-size: 14px; /* Reduced from 16px - makes everything smaller */
 }
 
 body {
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent zoom on input focus (iOS) */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  /* Scale all text - adjust this percentage to make text smaller/larger */
+  font-size: 87.5%; /* 87.5% = 14px, 75% = 12px, 100% = 16px */
 }
 
+/* ===== TOUCH & INTERACTION ===== */
 .touch-manipulation {
   user-select: none;
   -webkit-user-select: none;
 }
 
-input, textarea, [contenteditable] {
+input, textarea, select, [contenteditable] {
   user-select: text;
   -webkit-user-select: text;
+  /* Prevent zoom on focus (iOS) - ensure font-size is at least 16px */
+  font-size: 16px;
 }
 
-button, a {
+button, a, [role="button"] {
+  /* Ensure minimum touch target size (44x44px for accessibility) */
   min-height: 44px;
   min-width: 44px;
+  /* Prevent text selection on buttons */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
+/* ===== SCROLLING ===== */
 .scroll-smooth {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -68,7 +100,9 @@ button, a {
   display: none;
 }
 
+/* ===== MOBILE OPTIMIZATIONS ===== */
 @media (max-width: 640px) {
+  /* Full-screen dialogs on mobile */
   [role="dialog"] {
     width: 100vw;
     height: 100vh;
@@ -76,15 +110,48 @@ button, a {
     max-height: 100vh;
     border-radius: 0;
   }
+  
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Optimize images for mobile */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
+/* ===== SAFE AREA (for notched devices) ===== */
 @supports (padding: env(safe-area-inset-top)) {
   .safe-top { padding-top: env(safe-area-inset-top); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
   .safe-left { padding-left: env(safe-area-inset-left); }
   .safe-right { padding-right: env(safe-area-inset-right); }
+  
+  /* Full height considering safe areas */
+  .safe-full-height {
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
 }
 
+/* ===== PREVENT LAYOUT SHIFT ===== */
+/* Ensure images don't cause layout shifts */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== VIEWPORT UNITS FIX ===== */
+/* Fix for mobile browsers where vh doesn't account for address bar */
+.min-h-screen-fixed {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* ===== ANIMATIONS ===== */
 /* Spinning door animation */
 @keyframes spinDoor {
   0% { transform: rotateY(0deg); }
@@ -95,4 +162,117 @@ button, a {
 .animate-spin-door {
   animation: spinDoor 3s ease-in-out infinite;
   transform-style: preserve-3d;
+}
+
+/* Slide down animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+/* Use GPU acceleration for transforms */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== LANDSCAPE MOBILE FIX ===== */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduce padding in landscape mode */
+  .landscape-compact {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+}
+
+/* ===== TABLET OPTIMIZATIONS ===== */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Optimize for tablets */
+  body {
+    font-size: 14px;
+  }
+}
+
+/* ===== HIGH DPI SCREENS ===== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Sharper rendering on retina displays */
+  body {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* ===== FORM ELEMENTS ===== */
+/* Consistent styling across browsers */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Remove spinner from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ===== FOCUS VISIBLE ===== */
+/* Better focus indicators for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* Optimize for printing */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  @page {
+    margin: 2cm;
+  }
 }

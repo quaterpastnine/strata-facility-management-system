@@ -10,7 +10,7 @@ export default function LandingPage() {
   const quote = getQuoteOfTheDay();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-3 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-3 sm:p-6 overflow-x-hidden">
       <div className="text-center max-w-6xl mx-auto w-full">
         {/* Logo */}
         <div className="mb-6 sm:mb-8 md:mb-10">

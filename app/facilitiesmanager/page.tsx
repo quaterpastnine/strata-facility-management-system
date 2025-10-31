@@ -1,286 +1,195 @@
 'use client';
 
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { 
-  Calendar,
+  Calendar, 
+  Wrench, 
+  Users, 
   Building2,
-  Wrench,
-  Users,
-  LayoutDashboard,
-  Home,
-  FileText,
-  Settings,
-  LogOut,
-  ChevronRight,
-  Clock,
-  CheckCircle,
-  XCircle,
-  PlayCircle,
-  UserCheck,
-  Truck,
+  ArrowUpDown,
+  Settings as SettingsIcon,
+  ChevronRight
 } from 'lucide-react';
 
 export default function FacilitiesManagerDashboard() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      
-      {/* Header Bar - Dark Navy */}
-      <div className="bg-[#001F3F] border-b-2 border-cyan-500/30 shadow-xl">
-        <div className="px-8 py-6 flex items-center justify-between">
-          
-          {/* Left: Logo & Branding */}
-          <div className="flex items-center gap-6">
-            <Image
-              src="/logo.png"
-              alt="StrataTrac Logo"
-              width={220}
-              height={88}
-              priority
-              className="object-contain"
-            />
-            <div className="border-l border-cyan-500/30 pl-6">
-              <p className="text-cyan-400 text-xl font-semibold">Strata Management Solutions</p>
-              <p className="text-gray-400 text-base">Facilities Management System</p>
-            </div>
-          </div>
-
-          {/* Right: Navigation & User */}
-          <div className="flex items-center gap-4">
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-cyan-500 text-cyan-400 bg-transparent hover:bg-cyan-500 hover:text-white transition-all">
-              <Home className="h-5 w-5" />
-              Bookings
-            </button>
-            
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-blue-500 text-blue-400 bg-blue-500/20 hover:bg-blue-500 hover:text-white transition-all">
-              <LayoutDashboard className="h-5 w-5" />
-              Dashboard
-            </button>
-            
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-green-500 text-green-400 bg-transparent hover:bg-green-500 hover:text-white transition-all">
-              <FileText className="h-5 w-5" />
-              Reports
-            </button>
-            
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-purple-500 text-purple-400 bg-transparent hover:bg-purple-500 hover:text-white transition-all">
-              <Settings className="h-5 w-5" />
-              Admin
-            </button>
-
-            <div className="flex items-center gap-4 pl-6 ml-6 border-l border-cyan-500/30">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-                <span className="text-white font-bold text-lg">JD</span>
-              </div>
-              <div className="text-right">
-                <div className="font-semibold text-white text-lg">John Doe</div>
-                <div className="text-base text-cyan-400">Facilities Manager</div>
-              </div>
-            </div>
-
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all">
-              <LogOut className="h-5 w-5" />
-              Logout
-            </button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-900">
+      {/* Orange Header */}
+      <div className="bg-orange-500 py-6 px-8">
+        <h1 className="text-white text-2xl font-semibold">Facility Manager Dashboard</h1>
       </div>
 
-      {/* Page Header - Smaller with Gradient */}
-      <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 py-4 px-8 shadow-lg">
-        <h2 className="text-2xl font-bold text-white">Management of Schemes Features</h2>
-        <p className="text-white/90 text-sm">Facilities Manager Dashboard</p>
+      {/* Hero Image Section */}
+      <div className="relative h-64 bg-gray-800">
+        <img 
+          src="/api/placeholder/1920/400" 
+          alt="Building exterior" 
+          className="w-full h-full object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900"></div>
       </div>
 
       {/* Main Content */}
-      <div className="px-8 py-6">
-        
-        {/* Top Stats Row - Compact Tiles */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          
-          {/* Total Bookings */}
-          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-white/90 text-sm font-medium">Total Bookings</p>
-              <Calendar className="w-8 h-8 text-white/40" />
+      <div className="max-w-7xl mx-auto px-8 -mt-32 relative z-10">
+        {/* Stats Cards Row */}
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {/* Facilities Card */}
+          <div className="bg-blue-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <Calendar className="w-12 h-12" />
             </div>
-            <p className="text-white text-5xl font-bold">48</p>
+            <div className="text-4xl font-bold mb-2">2</div>
+            <div className="text-blue-100">Total bookings</div>
           </div>
 
-          {/* Move In/Out */}
-          <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-white/90 text-sm font-medium">Move In/Out</p>
-              <Truck className="w-8 h-8 text-white/40" />
+          {/* Pending Card */}
+          <div className="bg-orange-500 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <SettingsIcon className="w-12 h-12" />
             </div>
-            <p className="text-white text-5xl font-bold">8</p>
+            <div className="text-4xl font-bold mb-2">1</div>
+            <div className="text-orange-100">Awaiting approval</div>
           </div>
 
-          {/* Maintenance */}
-          <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-white/90 text-sm font-medium">Maintenance</p>
-              <Wrench className="w-8 h-8 text-white/40" />
+          {/* Move Requests Card */}
+          <div className="bg-orange-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <Building2 className="w-12 h-12" />
             </div>
-            <p className="text-white text-5xl font-bold">15</p>
+            <div className="text-4xl font-bold mb-2">1</div>
+            <div className="text-orange-100">Active</div>
           </div>
 
-          {/* Active Users */}
-          <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-white/90 text-sm font-medium">Active Users</p>
-              <Users className="w-8 h-8 text-white/40" />
+          {/* Maintenance Card */}
+          <div className="bg-teal-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <Wrench className="w-12 h-12" />
             </div>
-            <p className="text-white text-5xl font-bold">142</p>
+            <div className="text-4xl font-bold mb-2">3</div>
+            <div className="text-teal-100">Tickets</div>
           </div>
-
         </div>
 
-        {/* Section Title */}
-        <h3 className="text-white text-xl font-bold mb-4">Feature Modules</h3>
-
-        {/* Feature Cards Grid - 2x2 Layout */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* Quick Actions Section */}
+        <div className="mb-8">
+          <h2 className="text-white text-2xl font-semibold mb-6">Quick Actions</h2>
           
-          {/* Bookings Module */}
-          <div 
-            onClick={() => router.push('/facilitiesmanager/bookings')}
-            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-10 h-10 text-white" />
+          <div className="grid grid-cols-3 gap-6">
+            {/* Move In/Out Card */}
+            <div 
+              onClick={() => router.push('/facilitiesmanager/moveinout')}
+              className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-6 text-white cursor-pointer hover:shadow-xl transition-all"
+            >
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-white text-2xl font-bold">Bookings</h3>
-                  <p className="text-white/80 text-base">48 total • 12 pending</p>
+                  <ArrowUpDown className="w-10 h-10 mb-3" />
+                  <h3 className="text-2xl font-bold mb-2">Move In/Out</h3>
+                  <p className="text-orange-100 text-sm">Elevator Booking</p>
+                </div>
+                <ChevronRight className="w-6 h-6" />
+              </div>
+              
+              <div className="mt-6 space-y-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded p-3">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm">Move In - Auto Spin Door</span>
+                    <span className="bg-green-500/80 px-2 py-1 rounded text-xs">Approved</span>
+                  </div>
+                  <div className="text-xs text-orange-100">Nov 28, 2024 • 9:00 AM</div>
                 </div>
               </div>
-              <ChevronRight className="w-8 h-8 text-white/60" />
+              
+              <button className="mt-4 w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded font-medium transition-colors">
+                New Request
+              </button>
             </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Tennis Court 1</p>
-                  <span className="text-xs text-white/70 bg-white/20 px-2 py-1 rounded">Pending</span>
+
+            {/* Maintenance Card */}
+            <div 
+              onClick={() => router.push('/facilitiesmanager/maintenance')}
+              className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg p-6 text-white cursor-pointer hover:shadow-xl transition-all"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <Wrench className="w-10 h-10 mb-3" />
+                  <h3 className="text-2xl font-bold mb-2">Maintenance</h3>
+                  <p className="text-teal-100 text-sm">Report Issues</p>
                 </div>
-                <p className="text-white/70 text-sm">Sarah Johnson • Today 3:00 PM</p>
+                <ChevronRight className="w-6 h-6" />
               </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Swimming Pool</p>
-                  <span className="text-xs text-white/70 bg-white/20 px-2 py-1 rounded">Confirmed</span>
+              
+              <div className="mt-6 space-y-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded p-3">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm">AC Not Working</span>
+                    <span className="bg-yellow-500/80 px-2 py-1 rounded text-xs">In Progress</span>
+                  </div>
+                  <div className="text-xs text-teal-100">Dec 19, 2024 • Tech #3</div>
                 </div>
-                <p className="text-white/70 text-sm">Mike Brown • Tomorrow 10:00 AM</p>
               </div>
+              
+              <button className="mt-4 w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded font-medium transition-colors">
+                New Ticket
+              </button>
+            </div>
+
+            {/* Facilities Card */}
+            <div 
+              onClick={() => router.push('/facilitiesmanager/facilities')}
+              className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-6 text-white cursor-pointer hover:shadow-xl transition-all"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <Calendar className="w-10 h-10 mb-3" />
+                  <h3 className="text-2xl font-bold mb-2">Facilities</h3>
+                  <p className="text-blue-100 text-sm">Book Amenities</p>
+                </div>
+                <ChevronRight className="w-6 h-6" />
+              </div>
+              
+              <div className="mt-6 space-y-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded p-3">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm">Tennis Court 1</span>
+                    <span className="bg-green-500/80 px-2 py-1 rounded text-xs">Confirmed</span>
+                  </div>
+                  <div className="text-xs text-blue-100">Dec 15, 2024 • 3:00 PM</div>
+                </div>
+              </div>
+              
+              <button className="mt-4 w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded font-medium transition-colors">
+                View Facilities
+              </button>
             </div>
           </div>
-
-          {/* Move In/Out Module */}
-          <div 
-            onClick={() => router.push('/facilitiesmanager/move-in-out')}
-            className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Building2 className="w-10 h-10 text-white" />
-                <div>
-                  <h3 className="text-white text-2xl font-bold">Move In/Out</h3>
-                  <p className="text-white/80 text-base">8 total • 3 pending</p>
-                </div>
-              </div>
-              <ChevronRight className="w-8 h-8 text-white/60" />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Unit 205 - Move In</p>
-                  <span className="text-xs text-white/70 bg-white/20 px-2 py-1 rounded">Approved</span>
-                </div>
-                <p className="text-white/70 text-sm">John Smith • Dec 15, 2024 9:00 AM</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Unit 108 - Move Out</p>
-                  <span className="text-xs text-white/70 bg-white/20 px-2 py-1 rounded">Pending</span>
-                </div>
-                <p className="text-white/70 text-sm">Emma Davis • Dec 18, 2024 2:00 PM</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Maintenance Module */}
-          <div 
-            onClick={() => router.push('/facilitiesmanager/maintenance')}
-            className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Wrench className="w-10 h-10 text-white" />
-                <div>
-                  <h3 className="text-white text-2xl font-bold">Maintenance</h3>
-                  <p className="text-white/80 text-base">15 total • 6 open</p>
-                </div>
-              </div>
-              <ChevronRight className="w-8 h-8 text-white/60" />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Elevator #2 Issue</p>
-                  <span className="text-xs text-white/70 bg-red-500/30 px-2 py-1 rounded">Urgent</span>
-                </div>
-                <p className="text-white/70 text-sm">Unit 305 • Reported 2 hours ago</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Leaking Pipe</p>
-                  <span className="text-xs text-white/70 bg-yellow-500/30 px-2 py-1 rounded">In Progress</span>
-                </div>
-                <p className="text-white/70 text-sm">Unit 112 • Assigned to Tech #5</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Users Module */}
-          <div 
-            onClick={() => router.push('/facilitiesmanager/users')}
-            className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition-all"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <Users className="w-10 h-10 text-white" />
-                <div>
-                  <h3 className="text-white text-2xl font-bold">Users</h3>
-                  <p className="text-white/80 text-base">156 total • 142 active</p>
-                </div>
-              </div>
-              <ChevronRight className="w-8 h-8 text-white/60" />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">New Registrations</p>
-                  <span className="text-xs text-white/70 bg-white/20 px-2 py-1 rounded">5 This Week</span>
-                </div>
-                <p className="text-white/70 text-sm">3 residents • 2 staff members</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-base">Pending Approvals</p>
-                  <span className="text-xs text-white/70 bg-yellow-500/30 px-2 py-1 rounded">2 Waiting</span>
-                </div>
-                <p className="text-white/70 text-sm">Unit 405, Unit 207</p>
-              </div>
-            </div>
-          </div>
-
         </div>
 
+        {/* My Activity History */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
+          <div className="flex items-center mb-4">
+            <SettingsIcon className="w-6 h-6 text-white mr-3" />
+            <h2 className="text-white text-xl font-semibold">My Activity History</h2>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between bg-gray-700/50 rounded p-4">
+              <div className="flex items-center space-x-4">
+                <Calendar className="w-8 h-8 text-blue-400" />
+                <div>
+                  <div className="text-white font-medium">Tennis Court 1</div>
+                  <div className="text-gray-400 text-sm">Dec 15, 2024 • 3:00 PM</div>
+                </div>
+              </div>
+              <div>
+                <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded text-sm">Confirmed</span>
+                <ChevronRight className="w-5 h-5 text-gray-400 inline ml-2" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

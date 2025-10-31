@@ -1,392 +1,483 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import SplashScreen from '../components/SplashScreen';
 import { 
-  Calendar,
-  Building2,
-  Wrench,
-  Home,
-  LogOut,
+  Calendar, 
+  Wrench, 
+  Truck,
   ChevronRight,
+  Home,
   Clock,
   CheckCircle,
-  XCircle,
-  TrendingUp,
-  History,
-  Menu,
-  X,
+  AlertCircle,
+  Lock,
+  MessageSquare,
+  Send,
+  User
 } from 'lucide-react';
+import { PageLayout, ResidentHeader } from '@/components/resident';
+import { useData } from '@/contexts/DataContext';
+import { motion } from 'framer-motion';
+import type { ActivityItem } from '@/lib/types';
+
+// Comment Interface for two-way communication between Resident and FM
+interface Comment {
+  id: string;
+  author: 'resident' | 'fm';
+  message: string;
+  timestamp: string;
+  itemId: string;
+  itemType: 'maintenance' | 'move';
+}
 
 export default function ResidentDashboard() {
   const router = useRouter();
-  const [showSplash, setShowSplash] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Mock data for resident
-  const residentData = {
-    name: "Willow Legg",
-    unit: "Auto Spin Door",
-    initials: "WL",
-    stats: {
-      totalBookings: 12,
-      activeMoveRequests: 1,
-      maintenanceTickets: 3,
-      pendingApprovals: 2,
+  const { residentData, tickets, moveRequests, bookings, activityHistory, isLoading } = useData();
+  
+  // Comment state - in production this would come from backend
+  const [comments, setComments] = useState<Comment[]>([
+    {
+      id: '1',
+      author: 'fm',
+      message: 'Assigned to Tech #3 - John Smith. Work scheduled for tomorrow 2PM.',
+      timestamp: '2 hours ago',
+      itemId: '1',
+      itemType: 'maintenance'
     },
-    recentActivity: [
-      { type: 'booking', title: 'Tennis Court 1', status: 'Confirmed', date: 'Dec 15, 2024', time: '3:00 PM' },
-      { type: 'maintenance', title: 'AC Not Working', status: 'In Progress', date: 'Dec 10, 2024', assignee: 'Tech #3' },
-      { type: 'move', title: 'Move In Request', status: 'Approved', date: 'Nov 28, 2024', time: '9:00 AM' },
-      { type: 'booking', title: 'Swimming Pool', status: 'Completed', date: 'Dec 5, 2024', time: '2:00 PM' },
-      { type: 'maintenance', title: 'Leaking Faucet', status: 'Completed', date: 'Nov 20, 2024', assignee: 'Tech #1' },
-    ]
+    {
+      id: '2',
+      author: 'fm',
+      message: 'Approved for 2025-01-15. Elevator reserved from 9AM-12PM. Please ensure all items are packed.',
+      timestamp: '4 hours ago',
+      itemId: '1',
+      itemType: 'move'
+    }
+  ]);
+
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <ResidentHeader currentPage="Dashboard" />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-white text-lg">Loading...</div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // Calculate stats from actual data - ONLY ACTIVE ITEMS
+  const maintenanceActive = tickets?.filter(t => 
+    t.status !== 'Completed' && t.status !== 'Rejected' && t.status !== 'Cancelled'
+  ) || [];
+  const maintenanceCount = maintenanceActive.length;
+  const maintenancePending = tickets?.filter(t => t.status === 'Pending').length || 0;
+  const maintenanceInProgress = tickets?.filter(t => t.status === 'In Progress' || t.status === 'Open').length || 0;
+  
+  const moveRequestsActive = moveRequests?.filter(m => 
+    m.status !== 'Completed' && m.status !== 'Rejected' && m.status !== 'Cancelled'
+  ) || [];
+  const moveRequestsCount = moveRequestsActive.length;
+  const moveRequestsPending = moveRequests?.filter(m => m.status === 'Pending').length || 0;
+  const moveRequestsApproved = moveRequests?.filter(m => m.status === 'Approved' || m.status === 'In Progress').length || 0;
+
+  // Handle activity click - properly typed
+  const handleActivityClick = (activity: ActivityItem) => {
+    if (activity.type === 'maintenance' && activity.referenceId) {
+      router.push(`/resident/maintenance/${activity.referenceId}`);
+    } else if (activity.type === 'maintenance') {
+      router.push('/resident/maintenance');
+    } else if (activity.type === 'move' && activity.referenceId) {
+      router.push(`/resident/move-requests/${activity.referenceId}`);
+    } else if (activity.type === 'move') {
+      router.push('/resident/move-requests');
+    } else if (activity.type === 'booking') {
+      router.push('/resident/bookings');
+    }
   };
 
   return (
-    <>
-      {/* Splash Screen */}
-      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+    <PageLayout>
+      <ResidentHeader currentPage="Dashboard" />
 
-      {/* Main Dashboard */}
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative">
-      
-      {/* Background Image */}
-      <div 
-        className="fixed inset-0 opacity-40 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url("/background.jpg")',
-          zIndex: 0
-        }}
-      />
-      
-      {/* Content Wrapper */}
-      <div className="relative z-10">
-      
-      {/* Header Bar - Dark Navy with mobile optimization */}
-      <div className="bg-[#001F3F] border-b-2 border-cyan-500/30 shadow-xl">
-        <div className="px-3 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 flex items-center justify-between">
-          
-          {/* Mobile: Hamburger + Logo */}
-          <div className="flex items-center gap-3 sm:gap-4 md:gap-6 w-full md:w-auto">
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-cyan-400 hover:bg-cyan-500/20 transition-all"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-
-            {/* Logo - responsive sizing */}
-            <div className="flex items-center gap-3 sm:gap-4 md:gap-6 flex-1 md:flex-none">
-              <Image
-                src="/logo.png"
-                alt="StrataTrac Logo"
-                width={180}
-                height={72}
-                priority
-                className="object-contain w-32 h-auto sm:w-44 md:w-56"
-              />
-              <div className="hidden sm:block border-l border-cyan-500/30 pl-3 sm:pl-4 md:pl-6">
-                <p className="text-cyan-400 text-sm sm:text-lg md:text-xl font-semibold">Strata Management Solutions</p>
-                <p className="text-gray-400 text-xs sm:text-sm md:text-base">Resident Portal</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop: Navigation & User */}
-          <div className="hidden md:flex items-center gap-4">
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-cyan-500 text-cyan-400 bg-cyan-500/20 hover:bg-cyan-500 hover:text-white transition-all">
-              <Home className="h-5 w-5" />
-              My Dashboard
-            </button>
-            
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-blue-500 text-blue-400 bg-transparent hover:bg-blue-500 hover:text-white transition-all">
-              <Calendar className="h-5 w-5" />
-              My Bookings
-            </button>
-
-            {/* User Info */}
-            <div className="flex items-center gap-4 pl-6 ml-6 border-l border-cyan-500/30">
-              <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-                <span className="text-white font-bold text-lg">{residentData.initials}</span>
-              </div>
-              <div className="text-right">
-                <div className="font-semibold text-white text-lg">{residentData.name}</div>
-                <div className="text-base text-cyan-400">{residentData.unit}</div>
-              </div>
-            </div>
-
-            <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all">
-              <LogOut className="h-5 w-5" />
-              Logout
-            </button>
-          </div>
-
-          {/* Mobile: User avatar only */}
-          <div className="md:hidden">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-              <span className="text-white font-bold text-sm sm:text-base">{residentData.initials}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-[#001F3F] border-t border-cyan-500/30 px-3 py-4 space-y-2">
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium border-2 border-cyan-500 text-cyan-400 bg-cyan-500/20 hover:bg-cyan-500 hover:text-white transition-all">
-              <Home className="h-5 w-5" />
-              My Dashboard
-            </button>
-            
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium border-2 border-blue-500 text-blue-400 bg-transparent hover:bg-blue-500 hover:text-white transition-all">
-              <Calendar className="h-5 w-5" />
-              My Bookings
-            </button>
-
-            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-lg">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-                <span className="text-white font-bold text-sm">{residentData.initials}</span>
-              </div>
-              <div>
-                <div className="font-semibold text-white text-base">{residentData.name}</div>
-                <div className="text-sm text-cyan-400">{residentData.unit}</div>
-              </div>
-            </div>
-
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all">
-              <LogOut className="h-5 w-5" />
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Page Header - Rounded Tile - Mobile optimized */}
-      <div className="px-3 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6">
-        <div 
-          className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-xl sm:rounded-2xl py-4 px-4 sm:py-6 sm:px-6 md:py-8 md:px-8 shadow-2xl transition-all duration-1000 ease-out"
-          style={{
-            animation: 'slideDown 0.8s ease-out'
-          }}
-        >
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">Welcome, Willow Legg</h2>
-              <p className="text-white/90 text-base sm:text-lg md:text-xl font-medium">Auto Spin Door</p>
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="text-white text-base sm:text-lg md:text-2xl font-semibold">Friday, October 24, 2025 • 10:45 AM</p>
-              <p className="text-white/90 text-sm sm:text-base md:text-xl mt-1 sm:mt-2">🌤️ Partly Cloudy • 22°C</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="px-3 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6">
+      {/* Main Content - FULL WIDTH */}
+      <div className="px-2 sm:px-3 md:px-4 py-4">
         
-        {/* Stats Row - Personal Summary - Mobile responsive grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+        {/* Welcome Section */}
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <Home className="w-6 h-6 text-cyan-400" />
+            <h1 className="text-white text-2xl font-bold">Welcome, {residentData?.name || 'Resident'}</h1>
+          </div>
+          <p className="text-gray-300 text-base">{residentData?.unit || 'Unit 101'}</p>
+        </motion.div>
+
+        {/* FM Notifications Bar - SOLID BACKGROUND for better visibility */}
+        <motion.div 
+          className="mb-6 bg-gradient-to-r from-teal-800 to-cyan-800 border-2 border-cyan-400 rounded-lg p-4 shadow-xl"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <AlertCircle className="w-5 h-5 text-cyan-300 animate-pulse" />
+            <h3 className="text-white font-bold text-lg">Facilities Manager Updates</h3>
+          </div>
           
-          {/* Total Bookings */}
-          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <p className="text-white text-sm sm:text-base md:text-lg font-semibold">My Bookings</p>
-              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white/50" />
-            </div>
-            <p className="text-white text-3xl sm:text-4xl md:text-6xl font-bold">{residentData.stats.totalBookings}</p>
-            <p className="text-white/80 text-xs sm:text-sm md:text-base mt-1">All time</p>
-          </div>
+          {/* Filter for items with FM comments or status changes */}
+          {(() => {
+            // Get items with FM updates
+            const maintenanceWithFMUpdates = maintenanceActive.filter(t => 
+              t.status === 'In Progress' || 
+              t.status === 'Open' ||
+              t.assignedTo
+            ).slice(0, 2);
+            
+            const moveWithFMUpdates = moveRequestsActive.filter(m => 
+              m.status === 'Approved' || 
+              m.status === 'In Progress'
+            ).slice(0, 2);
+            
+            // Map to display format with comments
+            const allFMUpdates = [
+              ...maintenanceWithFMUpdates.map(t => {
+                const comment = comments.find(c => c.itemId === t.id && c.itemType === 'maintenance');
+                return {
+                  type: 'maintenance',
+                  id: t.id,
+                  title: t.title,
+                  status: t.status,
+                  message: comment?.message || `FM: ${t.assignedTo ? `Assigned to ${t.assignedTo}` : 'Work scheduled'}`,
+                  timestamp: comment?.timestamp || '1 hour ago',
+                  hasNewComment: true
+                };
+              }),
+              ...moveWithFMUpdates.map(m => {
+                const comment = comments.find(c => c.itemId === m.id && c.itemType === 'move');
+                return {
+                  type: 'move',
+                  id: m.id,
+                  title: `${m.moveType} Request`,
+                  status: m.status,
+                  message: comment?.message || `FM: Approved for ${m.moveDate}`,
+                  timestamp: comment?.timestamp || '2 hours ago',
+                  hasNewComment: true
+                };
+              })
+            ];
+            
+            if (allFMUpdates.length === 0) {
+              return (
+                <div className="text-gray-300 text-sm bg-black/20 rounded p-3">
+                  No new updates from Facilities Manager
+                </div>
+              );
+            }
+            
+            return (
+              <div className="space-y-2">
+                {allFMUpdates.map((update, idx) => (
+                  <motion.div
+                    key={`${update.type}-${update.id}`}
+                    className="flex items-center justify-between bg-gray-900 rounded-lg p-3 border border-cyan-500"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + idx * 0.1 }}
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      {update.type === 'maintenance' ? (
+                        <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center">
+                          <Wrench className="w-5 h-5 text-white" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                          <Truck className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm font-semibold">{update.title}</span>
+                          {update.hasNewComment && (
+                            <span className="bg-cyan-500 text-white text-xs px-2 py-0.5 rounded-full">New</span>
+                          )}
+                        </div>
+                        <div className="text-cyan-200 text-sm mt-1 font-medium">
+                          <MessageSquare className="w-3 h-3 inline mr-1" />
+                          {update.message}
+                        </div>
+                        <div className="text-gray-400 text-xs mt-1">{update.timestamp}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/resident/${update.type === 'maintenance' ? 'maintenance' : 'move-requests'}/${update.id}`)}
+                      className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-1 transition-all"
+                    >
+                      View <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            );
+          })()}
+        </motion.div>
 
-          {/* Pending Approvals */}
-          <div className="bg-gradient-to-br from-yellow-600 to-orange-700 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <p className="text-white text-sm sm:text-base md:text-lg font-semibold">Pending</p>
-              <Clock className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white/50" />
-            </div>
-            <p className="text-white text-3xl sm:text-4xl md:text-6xl font-bold">{residentData.stats.pendingApprovals}</p>
-            <p className="text-white/80 text-xs sm:text-sm md:text-base mt-1">Awaiting approval</p>
-          </div>
-
-          {/* Move Requests */}
-          <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <p className="text-white text-sm sm:text-base md:text-lg font-semibold">Move Requests</p>
-              <Building2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white/50" />
-            </div>
-            <p className="text-white text-3xl sm:text-4xl md:text-6xl font-bold">{residentData.stats.activeMoveRequests}</p>
-            <p className="text-white/80 text-xs sm:text-sm md:text-base mt-1">Active</p>
-          </div>
-
-          {/* Maintenance */}
-          <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <p className="text-white text-sm sm:text-base md:text-lg font-semibold">Maintenance</p>
-              <Wrench className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white/50" />
-            </div>
-            <p className="text-white text-3xl sm:text-4xl md:text-6xl font-bold">{residentData.stats.maintenanceTickets}</p>
-            <p className="text-white/80 text-xs sm:text-sm md:text-base mt-1">Tickets</p>
-          </div>
-
-        </div>
-
-        {/* Quick Actions - Mobile: Stack vertically, Tablet+: 3 columns */}
-        <h3 className="text-gray-200 text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        {/* Three Main Tiles - Keep at 3 for proper layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-4 mb-6">
           
-          {/* Move In/Out */}
-          <div 
+          {/* Move In/Move Out Tile */}
+          <motion.button
             onClick={() => router.push('/resident/move-requests')}
-            className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all active:scale-95"
+            className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white cursor-pointer hover:from-orange-400 hover:to-orange-500 transition-all shadow-xl text-left border-2 border-orange-400 min-h-[240px] flex flex-col"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+            whileHover={{ scale: 1.02, y: -4 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                <div>
-                  <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold">Move In/Out</h3>
-                  <p className="text-white/90 text-sm sm:text-base md:text-lg">Elevator booking</p>
-                </div>
-              </div>
-              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-white/60" />
+            <div className="flex items-center justify-between mb-4">
+              <Truck className="w-14 h-14 text-white drop-shadow-lg" />
+              <ChevronRight className="w-6 h-6 text-white" />
             </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-3 sm:p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-sm sm:text-base md:text-lg">Move In - Auto Spin Door</p>
-                  <span className="text-xs sm:text-sm text-white/80 bg-green-500/30 px-2 py-1 rounded">Approved</span>
-                </div>
-                <p className="text-white/80 text-xs sm:text-sm md:text-base">Nov 28, 2024 • 9:00 AM</p>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold mb-2">Move In/Move Out</h3>
+              <div className="text-4xl font-bold mb-2">
+                {moveRequestsCount}
               </div>
+              <div className="text-base text-orange-100">Active Requests</div>
             </div>
-            
-            <button className="mt-3 sm:mt-4 w-full bg-white/20 hover:bg-white/30 text-white font-semibold py-2 px-4 rounded-lg transition-all text-sm sm:text-base active:scale-95">
-              New Request
-            </button>
-          </div>
+            {/* Status indicator with solid background */}
+            {moveRequestsPending > 0 && (
+              <div className="text-sm text-white mt-3 flex items-center gap-2 bg-orange-700 rounded-lg p-2">
+                <Clock className="w-4 h-4" />
+                {moveRequestsPending} pending FM review
+              </div>
+            )}
+            {moveRequestsApproved > 0 && moveRequestsPending === 0 && (
+              <div className="text-sm text-white mt-3 flex items-center gap-2 bg-green-600 rounded-lg p-2">
+                <CheckCircle className="w-4 h-4" />
+                {moveRequestsApproved} approved
+              </div>
+            )}
+          </motion.button>
 
-          {/* Maintenance */}
-          <div 
+          {/* Maintenance Tile */}
+          <motion.button
             onClick={() => router.push('/resident/maintenance')}
-            className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all active:scale-95"
+            className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-xl p-6 text-white cursor-pointer hover:from-teal-500 hover:to-teal-600 transition-all shadow-xl text-left border-2 border-teal-400 min-h-[240px] flex flex-col"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+            whileHover={{ scale: 1.02, y: -4 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Wrench className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                <div>
-                  <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold">Maintenance</h3>
-                  <p className="text-white/90 text-sm sm:text-base md:text-lg">Report issues</p>
-                </div>
-              </div>
-              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-white/60" />
+            <div className="flex items-center justify-between mb-4">
+              <Wrench className="w-14 h-14 text-white drop-shadow-lg" />
+              <ChevronRight className="w-6 h-6 text-white" />
             </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-3 sm:p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-sm sm:text-base md:text-lg">AC Not Working</p>
-                  <span className="text-xs sm:text-sm text-white/80 bg-yellow-500/30 px-2 py-1 rounded">In Progress</span>
-                </div>
-                <p className="text-white/80 text-xs sm:text-sm md:text-base">Dec 10, 2024 • Tech #3</p>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold mb-2">Maintenance</h3>
+              <div className="text-4xl font-bold mb-2">
+                {maintenanceCount}
               </div>
+              <div className="text-base text-teal-100">Active Tickets</div>
             </div>
-            
-            <button className="mt-3 sm:mt-4 w-full bg-white/20 hover:bg-white/30 text-white font-semibold py-2 px-4 rounded-lg transition-all text-sm sm:text-base active:scale-95">
-              New Ticket
-            </button>
-          </div>
+            {/* Status indicator with solid background */}
+            {maintenanceInProgress > 0 && (
+              <div className="text-sm text-white mt-3 flex items-center gap-2 bg-yellow-600 rounded-lg p-2">
+                <AlertCircle className="w-4 h-4" />
+                {maintenanceInProgress} in progress
+              </div>
+            )}
+            {maintenancePending > 0 && maintenanceInProgress === 0 && (
+              <div className="text-sm text-white mt-3 flex items-center gap-2 bg-teal-800 rounded-lg p-2">
+                <Clock className="w-4 h-4" />
+                {maintenancePending} pending FM review
+              </div>
+            )}
+          </motion.button>
 
-          {/* Bookings */}
-          <div 
-            onClick={() => router.push('/resident/bookings')}
-            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 shadow-lg cursor-pointer hover:scale-105 transition-all active:scale-95"
+          {/* Facilities Booking Tile - Coming Soon */}
+          <motion.div
+            className="bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl p-6 text-white cursor-not-allowed shadow-xl text-left border-2 border-gray-500 min-h-[240px] flex flex-col opacity-75"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 0.75, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.5 }}
           >
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                <div>
-                  <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold">My Bookings</h3>
-                  <p className="text-white/90 text-sm sm:text-base md:text-lg">View & manage</p>
-                </div>
-              </div>
-              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-white/60" />
+            <div className="flex items-center justify-between mb-4">
+              <Calendar className="w-14 h-14 text-gray-400" />
+              <Lock className="w-6 h-6 text-gray-400" />
             </div>
-            
-            <div className="space-y-2">
-              <div className="bg-white/10 rounded-lg p-3 sm:p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-sm sm:text-base md:text-lg">Tennis Court 1</p>
-                  <span className="text-xs sm:text-sm text-white/80 bg-green-500/30 px-2 py-1 rounded">Confirmed</span>
-                </div>
-                <p className="text-white/80 text-xs sm:text-sm md:text-base">Dec 15, 2024 • 3:00 PM</p>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold mb-2">Facility Bookings</h3>
+              <div className="text-3xl font-semibold mb-2 text-gray-300">
+                Coming Soon
               </div>
+              <div className="text-base text-gray-400">Book amenities & facilities</div>
             </div>
-            
-            <button className="mt-3 sm:mt-4 w-full bg-white/20 hover:bg-white/30 text-white font-semibold py-2 px-4 rounded-lg transition-all text-sm sm:text-base active:scale-95">
-              New Booking
-            </button>
-          </div>
-
+            <div className="text-sm text-gray-300 mt-3 bg-gray-800 rounded-lg p-2">
+              Currently under development
+            </div>
+          </motion.div>
         </div>
 
-        {/* Activity History */}
-        <h3 className="text-gray-200 text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
-          <History className="w-6 h-6 sm:w-8 sm:h-8" />
-          My Activity History  
-        </h3>
-        <div className="bg-gray-800/60 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-white/20">
-          <div className="space-y-2 sm:space-y-3">
-            {residentData.recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-center justify-between p-3 sm:p-4 md:p-6 bg-gray-700/40 rounded-lg hover:bg-gray-700/60 transition-all cursor-pointer active:scale-98">
-                <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
-                  {activity.type === 'booking' && <Calendar className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-blue-400 flex-shrink-0" />}
-                  {activity.type === 'move' && <Building2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-orange-400 flex-shrink-0" />}
-                  {activity.type === 'maintenance' && <Wrench className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-teal-400 flex-shrink-0" />}
-                  
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-200 font-bold text-base sm:text-xl md:text-3xl truncate">{activity.title}</p>
-                    <p className="text-gray-300 text-sm sm:text-base md:text-xl">
-                      {activity.date} 
-                      {activity.time && ` • ${activity.time}`}
-                      {activity.assignee && ` • ${activity.assignee}`}
-                    </p>
+        {/* Activity History and Stats Section - Full Width */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          
+          {/* Recent Activity */}
+          <motion.div 
+          className="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 shadow-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="w-5 h-5 text-cyan-400" />
+            <h2 className="text-white text-lg font-bold">Recent Activity</h2>
+          </div>
+          
+          {activityHistory && activityHistory.length > 0 ? (
+            <div className="space-y-2">
+              {activityHistory.slice(0, 5).map((activity, idx) => (
+                <motion.button
+                  key={activity.id}
+                  onClick={() => handleActivityClick(activity)}
+                  className="w-full flex items-center justify-between bg-gray-800 rounded-lg p-3 border border-gray-600 hover:bg-gray-700 hover:border-cyan-500 transition-all cursor-pointer text-left"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 + idx * 0.1 }}
+                  whileHover={{ scale: 1.01, x: 5 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Icon with solid background */}
+                    {activity.type === 'maintenance' && (
+                      <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center">
+                        <Wrench className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                    {activity.type === 'move' && (
+                      <div className="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center">
+                        <Truck className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                    {activity.type === 'booking' && (
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-semibold text-sm">{activity.title}</span>
+                        {/* Show comment indicator for items with FM responses */}
+                        {(activity.status === 'In Progress' || activity.status === 'Approved') && (
+                          <span className="bg-cyan-500 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <MessageSquare className="w-3 h-3" />
+                            FM Reply
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-gray-400 text-xs">{activity.date}{activity.time ? ` • ${activity.time}` : ''}</div>
+                    </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                      activity.status === 'Completed' ? 'bg-green-600 text-white' :
+                      activity.status === 'In Progress' ? 'bg-yellow-600 text-white' :
+                      activity.status === 'Pending' ? 'bg-orange-600 text-white' :
+                      activity.status === 'Approved' ? 'bg-green-600 text-white' :
+                      activity.status === 'Confirmed' ? 'bg-blue-600 text-white' :
+                      'bg-gray-600 text-white'
+                    }`}>
+                      {activity.status}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-400 text-center py-6 text-sm bg-gray-800 rounded-lg">
+              No recent activity
+            </div>
+          )}
+          </motion.div>
+          
+          {/* Quick Stats Panel */}
+          <motion.div
+            className="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 shadow-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <AlertCircle className="w-5 h-5 text-cyan-400" />
+              <h2 className="text-white text-lg font-bold">Quick Overview</h2>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* Pending Items */}
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="text-yellow-400 text-3xl font-bold mb-2">
+                  {maintenancePending + moveRequestsPending}
                 </div>
-                
-                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                  {activity.status === 'Confirmed' && (
-                    <span className="text-xs sm:text-sm md:text-xl text-green-200 bg-green-600/50 px-2 sm:px-4 md:px-6 py-1 sm:py-2 md:py-3 rounded-full font-bold whitespace-nowrap">
-                      {activity.status}
-                    </span>
-                  )}
-                  {activity.status === 'Approved' && (
-                    <span className="text-xs sm:text-sm md:text-xl text-green-200 bg-green-600/50 px-2 sm:px-4 md:px-6 py-1 sm:py-2 md:py-3 rounded-full font-bold whitespace-nowrap">
-                      {activity.status}
-                    </span>
-                  )}
-                  {activity.status === 'In Progress' && (
-                    <span className="text-xs sm:text-sm md:text-xl text-yellow-200 bg-yellow-600/50 px-2 sm:px-4 md:px-6 py-1 sm:py-2 md:py-3 rounded-full font-bold whitespace-nowrap">
-                      {activity.status}
-                    </span>
-                  )}
-                  {activity.status === 'Completed' && (
-                    <span className="text-xs sm:text-sm md:text-xl text-gray-200 bg-gray-600/50 px-2 sm:px-4 md:px-6 py-1 sm:py-2 md:py-3 rounded-full font-bold whitespace-nowrap">
-                      {activity.status}
-                    </span>
-                  )}
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 hidden sm:block" />
-                </div>
+                <div className="text-gray-300 text-sm font-semibold">Total Pending</div>
+                <div className="text-gray-400 text-xs mt-1">Awaiting FM review</div>
               </div>
-            ))}
-          </div>
+              
+              {/* In Progress Items */}
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="text-orange-400 text-3xl font-bold mb-2">
+                  {maintenanceInProgress + moveRequestsApproved}
+                </div>
+                <div className="text-gray-300 text-sm font-semibold">In Progress</div>
+                <div className="text-gray-400 text-xs mt-1">Being worked on</div>
+              </div>
+              
+              {/* Response Time */}
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="text-green-400 text-3xl font-bold mb-2">
+                  &lt;24h
+                </div>
+                <div className="text-gray-300 text-sm font-semibold">Avg Response</div>
+                <div className="text-gray-400 text-xs mt-1">FM response time</div>
+              </div>
+              
+              {/* Satisfaction */}
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="text-cyan-400 text-3xl font-bold mb-2">
+                  98%
+                </div>
+                <div className="text-gray-300 text-sm font-semibold">Satisfaction</div>
+                <div className="text-gray-400 text-xs mt-1">Resident rating</div>
+              </div>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="mt-6 space-y-2">
+              <button
+                onClick={() => router.push('/resident/maintenance/new')}
+                className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                <Wrench className="w-5 h-5" />
+                Report Maintenance Issue
+              </button>
+              <button
+                onClick={() => router.push('/resident/move-requests/new')}
+                className="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                <Truck className="w-5 h-5" />
+                Schedule Move
+              </button>
+            </div>
+          </motion.div>
         </div>
 
       </div>
-      </div>
-    </div>
-    </>
+    </PageLayout>
   );
 }
