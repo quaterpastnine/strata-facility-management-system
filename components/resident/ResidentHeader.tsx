@@ -63,13 +63,14 @@ export function ResidentHeader({
           {actions}
 
           <div className="flex items-center gap-4 pl-6 ml-6 border-l border-cyan-500/30">
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-cyan-400">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-cyan-400 flex-shrink-0 bg-gray-700">
               <Image
                 src="/willow.jpg"
                 alt="Resident Avatar"
                 width={56}
                 height={56}
-                className="object-cover w-full h-full"
+                className="w-full h-full object-cover"
+                style={{ objectPosition: 'center 30%' }}
               />
             </div>
             <div className="text-right">
@@ -88,13 +89,14 @@ export function ResidentHeader({
         </div>
 
         <div className="md:hidden">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-cyan-400">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-cyan-400 flex-shrink-0 bg-gray-700">
             <Image
               src="/willow.jpg"
               alt="Resident Avatar"
               width={48}
               height={48}
-              className="object-cover w-full h-full"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: 'center 30%' }}
             />
           </div>
         </div>
@@ -111,13 +113,14 @@ export function ResidentHeader({
           </button>
 
           <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-lg">
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400 flex-shrink-0 bg-gray-700">
               <Image
                 src="/willow.jpg"
                 alt="Resident Avatar"
                 width={40}
                 height={40}
-                className="object-cover w-full h-full"
+                className="w-full h-full object-cover"
+                style={{ objectPosition: 'center 30%' }}
               />
             </div>
             <div>

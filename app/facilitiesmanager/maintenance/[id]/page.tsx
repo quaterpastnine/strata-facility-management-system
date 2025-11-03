@@ -43,22 +43,13 @@ export default function FMMaintenanceDetailPage() {
   const { tickets, updateTicket, getComments, addComment, markCommentsAsRead, isLoading } = useData();
   
   const [editMode, setEditMode] = useState(false);
-  const [status, setStatus] = useState<MaintenanceStatus>('Pending');
-  const [priority, setPriority] = useState<MaintenancePriority>('Medium');
-  const [assignedTo, setAssignedTo] = useState('');
   const [commentText, setCommentText] = useState('');
   const [saving, setSaving] = useState(false);
   
   // Find the specific ticket
   const ticket = useMemo(() => {
-    const found = tickets?.find(t => t.id === ticketId) || null;
-    if (found && !editMode) {
-      setStatus(found.status);
-      setPriority(found.priority);
-      setAssignedTo(found.assignedTo || '');
-    }
-    return found;
-  }, [tickets, ticketId, editMode]);
+    return tickets?.find(t => t.id === ticketId) || null;
+  }, [tickets, ticketId]);
 
   // Get relevant suppliers based on ticket category
   const relevantSuppliers = useMemo(() => {
@@ -79,41 +70,34 @@ export default function FMMaintenanceDetailPage() {
     }
   }, [ticket, markCommentsAsRead]);
 
-  const handleSaveChanges = async () => {
+  const handleStatusChange = (newStatus: MaintenanceStatus) => {
     if (!ticket) return;
     
-    setSaving(true);
-    try {
-      const updates: Partial<MaintenanceTicket> = {
-        status,
-        priority,
-        assignedTo: assignedTo || undefined,
-      };
+    const updates: Partial<MaintenanceTicket> = { status: newStatus };
+    
+    if (newStatus === 'Completed') {
+      updates.dateCompleted = new Date().toISOString().split('T')[0];
+    }
+    
+    updateTicket(ticket.id, updates);
+    addComment(ticket.id, 'maintenance', `Status changed: ${ticket.status} → ${newStatus}`, 'fm');
+  };
 
-      // If completing, add completion date
-      if (status === 'Completed') {
-        updates.dateCompleted = new Date().toISOString().split('T')[0];
-      }
+  const handlePriorityChange = (newPriority: MaintenancePriority) => {
+    if (!ticket) return;
+    
+    updateTicket(ticket.id, { priority: newPriority });
+    addComment(ticket.id, 'maintenance', `Priority changed: ${ticket.priority} → ${newPriority}`, 'fm');
+  };
 
-      updateTicket(ticket.id, updates);
-      
-      // Add automatic FM comment about the change
-      const changes = [];
-      if (ticket.status !== status) changes.push(`Status: ${ticket.status} → ${status}`);
-      if (ticket.priority !== priority) changes.push(`Priority: ${ticket.priority} → ${priority}`);
-      if (ticket.assignedTo !== assignedTo && assignedTo) changes.push(`Assigned to supplier: ${assignedTo}`);
-      
-      if (changes.length > 0) {
-        addComment(ticket.id, 'maintenance', `FM Updated: ${changes.join(', ')}`, 'fm');
-      }
-
-      setEditMode(false);
-      alert('Changes saved successfully!');
-    } catch (error) {
-      console.error('Error saving changes:', error);
-      alert('Error saving changes. Please try again.');
-    } finally {
-      setSaving(false);
+  const handleSupplierChange = (supplier: string) => {
+    if (!ticket) return;
+    
+    updateTicket(ticket.id, { assignedTo: supplier || undefined });
+    if (supplier) {
+      addComment(ticket.id, 'maintenance', `Assigned to supplier: ${supplier}`, 'fm');
+    } else {
+      addComment(ticket.id, 'maintenance', 'Supplier unassigned', 'fm');
     }
   };
 
@@ -140,10 +124,7 @@ export default function FMMaintenanceDetailPage() {
 
   const handleApprove = () => {
     if (!ticket) return;
-    
-    updateTicket(ticket.id, { status: 'Open' });
-    addComment(ticket.id, 'maintenance', 'Ticket approved and opened for work', 'fm');
-    setStatus('Open');
+    handleStatusChange('Open');
   };
 
   if (isLoading) {
@@ -239,38 +220,12 @@ export default function FMMaintenanceDetailPage() {
                 <p className="text-teal-100">Maintenance Ticket #{ticket.id}</p>
               </div>
             </div>
-            {editMode ? (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveChanges}
-                  disabled={saving}
-                  className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-semibold transition-all flex items-center gap-2"
-                >
-                  <Save className="w-5 h-5" />
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setEditMode(true)}
-                className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl font-semibold transition-all flex items-center gap-2"
-              >
-                <Edit className="w-5 h-5" />
-                Edit Details
-              </button>
-            )}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Left Column - Ticket Details */}
@@ -290,44 +245,32 @@ export default function FMMaintenanceDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-400 text-sm mb-2">Status</label>
-                  {editMode ? (
-                    <select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value as MaintenanceStatus)}
-                      className="w-full bg-gray-700 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500"
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Open">Open</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Rejected">Rejected</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  ) : (
-                    <div className={`${getStatusColor(ticket.status)} text-white px-4 py-3 rounded-xl font-bold text-center`}>
-                      {ticket.status}
-                    </div>
-                  )}
+                  <select
+                    value={ticket.status}
+                    onChange={(e) => handleStatusChange(e.target.value as MaintenanceStatus)}
+                    className="w-full bg-gray-700 text-white border-2 border-gray-600 rounded-xl px-4 py-3 font-bold focus:outline-none focus:border-cyan-500 hover:border-cyan-400 transition-colors"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-gray-400 text-sm mb-2">Priority</label>
-                  {editMode ? (
-                    <select
-                      value={priority}
-                      onChange={(e) => setPriority(e.target.value as MaintenancePriority)}
-                      className="w-full bg-gray-700 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500"
-                    >
-                      <option value="Low">Low</option>
-                      <option value="Medium">Medium</option>
-                      <option value="High">High</option>
-                      <option value="Emergency">Emergency</option>
-                    </select>
-                  ) : (
-                    <div className={`${getPriorityColor(ticket.priority)} text-white px-4 py-3 rounded-xl font-bold text-center`}>
-                      {ticket.priority}
-                    </div>
-                  )}
+                  <select
+                    value={ticket.priority}
+                    onChange={(e) => handlePriorityChange(e.target.value as MaintenancePriority)}
+                    className="w-full bg-gray-700 text-white border-2 border-gray-600 rounded-xl px-4 py-3 font-bold focus:outline-none focus:border-cyan-500 hover:border-cyan-400 transition-colors"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Emergency">Emergency</option>
+                  </select>
                 </div>
               </div>
             </motion.div>
@@ -344,40 +287,23 @@ export default function FMMaintenanceDetailPage() {
                 Supplier Assignment
               </h2>
               
-              {editMode ? (
-                <div>
-                  <label className="block text-gray-400 text-sm mb-2">Assign Approved Supplier</label>
-                  <select
-                    value={assignedTo}
-                    onChange={(e) => setAssignedTo(e.target.value)}
-                    className="w-full bg-gray-700 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500"
-                  >
-                    <option value="">-- Select Supplier --</option>
-                    {relevantSuppliers.map((supplier) => (
-                      <option key={supplier} value={supplier}>
-                        {supplier}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-gray-400 text-xs mt-2">Showing approved suppliers for {ticket.category}</p>
-                </div>
-              ) : (
-                <div className="bg-gray-700/50 rounded-xl p-4">
-                  {ticket.assignedTo ? (
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center">
-                        <UserCheck className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold">{ticket.assignedTo}</p>
-                        <p className="text-gray-400 text-sm">Assigned Supplier</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-400 text-center">No supplier assigned yet</p>
-                  )}
-                </div>
-              )}
+              {/* No edit mode - supplier assignment directly in dropdown */}
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">Assign Approved Supplier</label>
+                <select
+                  value={ticket.assignedTo || ''}
+                  onChange={(e) => handleSupplierChange(e.target.value)}
+                  className="w-full bg-gray-700 text-white border-2 border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 hover:border-cyan-400 transition-colors"
+                >
+                  <option value="">-- Select Supplier --</option>
+                  {relevantSuppliers.map((supplier) => (
+                    <option key={supplier} value={supplier}>
+                      {supplier}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-gray-400 text-xs mt-2">Showing approved suppliers for {ticket.category}</p>
+              </div>
             </motion.div>
 
             {/* Description Card */}

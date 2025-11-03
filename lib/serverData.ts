@@ -9,7 +9,7 @@ let residentData: ResidentData = {
   email: "willow.legg@example.com",
   phone: "(555) 987-6543",
   stats: {
-    totalBookings: 2,
+    totalBookings: 0,
     activeMoveRequests: 3,
     maintenanceTickets: 6,
     pendingApprovals: 2,
@@ -25,7 +25,7 @@ let tickets: MaintenanceTicket[] = [
     priority: 'High',
     status: 'In Progress',
     description: 'Air conditioner in bedroom stopped cooling effectively. Makes strange rattling noise when starting up. Issue began approximately 2 days ago.',
-    dateSubmitted: '2025-10-28',
+    dateSubmitted: '2025-11-01',
     location: 'Unit 111 - Bedroom',
     assignedTo: 'Tech #3 - John Smith',
     residentName: 'Willow Legg',
@@ -38,8 +38,8 @@ let tickets: MaintenanceTicket[] = [
     priority: 'Medium',
     status: 'Completed',
     description: 'Kitchen faucet has been dripping constantly for the past week. Water leak appears to be coming from the base of the faucet handle.',
-    dateSubmitted: '2025-10-25',
-    dateCompleted: '2025-10-27',
+    dateSubmitted: '2025-11-05',
+    dateCompleted: '2025-11-07',
     location: 'Unit 111 - Kitchen',
     assignedTo: 'Tech #1 - Mike Johnson',
     residentName: 'Willow Legg',
@@ -52,7 +52,7 @@ let tickets: MaintenanceTicket[] = [
     priority: 'Low',
     status: 'Pending',
     description: 'Bathroom door handle is loose and wobbles when turned. The screws appear to need tightening or replacement.',
-    dateSubmitted: '2025-10-30',
+    dateSubmitted: '2025-11-10',
     location: 'Unit 111 - Bathroom',
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
@@ -64,7 +64,7 @@ let tickets: MaintenanceTicket[] = [
     priority: 'Medium',
     status: 'Open',
     description: 'Light switch in living room requires multiple attempts to turn on/off. Sometimes sparks slightly.',
-    dateSubmitted: '2025-10-31',
+    dateSubmitted: '2025-11-12',
     location: 'Unit 111 - Living Room',
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
@@ -76,11 +76,11 @@ let tickets: MaintenanceTicket[] = [
     priority: 'Low',
     status: 'Rejected',
     description: 'Low water pressure in shower.',
-    dateSubmitted: '2025-11-01',
+    dateSubmitted: '2025-11-18',
     location: 'Unit 111 - Bathroom',
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
-    rejectionReason: 'This is a building-wide issue already being addressed. See notice on resident portal. Expected resolution: Jan 5, 2025.',
+    rejectionReason: 'This is a building-wide issue already being addressed. See notice on resident portal. Expected resolution: Jan 5, 2026.',
   },
   {
     id: 'MNT-006',
@@ -89,7 +89,7 @@ let tickets: MaintenanceTicket[] = [
     priority: 'Low',
     status: 'Cancelled',
     description: 'Requested replacement of torn window screen in living room.',
-    dateSubmitted: '2025-11-02',
+    dateSubmitted: '2025-11-22',
     location: 'Unit 111 - Living Room',
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
@@ -110,7 +110,7 @@ const moveRequests: MoveRequest[] = [
     residentPhone: '(555) 987-6543',
     
     // Move Details
-    moveDate: '2024-11-28',
+    moveDate: '2025-11-01',
     startTime: '09:00',
     endTime: '15:00',
     estimatedDuration: 6,
@@ -131,11 +131,11 @@ const moveRequests: MoveRequest[] = [
     depositPaymentMethod: 'bank', // Resident chose bank transfer
     depositAmount: 500,
     depositPaid: true,
-    depositPaidDate: '2024-11-16',
+    depositPaidDate: '2025-10-25',
     depositProofUrl: '/uploads/proof-move-001.pdf', // Bank transfer proof
     depositStatus: 'verified',
     depositVerifiedBy: 'Sarah Johnson',
-    depositVerifiedDate: '2024-11-16',
+    depositVerifiedDate: '2025-10-25',
     
     // Refund Details (for Move Out only - but keeping structure)
     depositRefundAccount: undefined,
@@ -151,15 +151,15 @@ const moveRequests: MoveRequest[] = [
     
     // Acceptance
     termsAccepted: true,
-    termsAcceptedDate: '2024-11-15',
+    termsAcceptedDate: '2025-10-20',
     
     // Approval
     approvedBy: 'Facilities Manager - Sarah Johnson',
-    approvedDate: '2024-11-16',
+    approvedDate: '2025-10-21',
     
     // Timestamps
-    submittedDate: '2024-11-15',
-    completedDate: '2024-11-28',
+    submittedDate: '2025-10-20',
+    completedDate: '2025-11-01',
     
     // REMOVED OLD FIELDS:
     // hasInsurance, insuranceProvider, insurancePolicyNumber
@@ -177,7 +177,7 @@ const moveRequests: MoveRequest[] = [
     residentPhone: '(555) 987-6543',
     
     // Move Details
-    moveDate: '2025-01-15',
+    moveDate: '2025-11-15',
     startTime: '08:00',
     endTime: '14:00',
     estimatedDuration: 6,
@@ -198,8 +198,8 @@ const moveRequests: MoveRequest[] = [
     depositPaymentMethod: 'cash', // Resident chose cash payment
     depositAmount: 500,
     depositPaid: false, // ⚠️ Claimed but not yet verified by FM
-    depositPaidDate: '2025-01-03', // Date resident claimed they paid
-    depositCashAppointmentDate: '2025-01-05', // FM scheduled appointment
+    depositPaidDate: '2025-11-01', // Date resident claimed they paid
+    depositCashAppointmentDate: '2025-11-05', // FM scheduled appointment
     depositBankDetails: undefined, // Not needed for cash
     depositStatus: 'claimed',
     
@@ -225,14 +225,14 @@ const moveRequests: MoveRequest[] = [
     
     // Acceptance
     termsAccepted: true,
-    termsAcceptedDate: '2024-12-20',
+    termsAcceptedDate: '2025-10-20',
     
     // Approval
     approvedBy: 'Facilities Manager - Sarah Johnson',
-    approvedDate: '2024-12-21',
+    approvedDate: '2025-10-21',
     
     // Timestamps
-    submittedDate: '2024-12-20',
+    submittedDate: '2025-10-20',
     
     // REMOVED OLD FIELDS:
     // hasInsurance, insuranceProvider, insurancePolicyNumber
@@ -249,7 +249,7 @@ const moveRequests: MoveRequest[] = [
     residentPhone: '(555) 987-6543',
     
     // Move Details
-    moveDate: '2025-02-10',
+    moveDate: '2025-11-20',
     startTime: '10:00',
     endTime: '16:00',
     estimatedDuration: 6,
@@ -284,14 +284,14 @@ const moveRequests: MoveRequest[] = [
     
     // Acceptance
     termsAccepted: true,
-    termsAcceptedDate: '2024-12-28',
+    termsAcceptedDate: '2025-10-28',
     
     // Approval - NOT YET APPROVED
     approvedBy: undefined,
     approvedDate: undefined,
     
     // Timestamps
-    submittedDate: '2024-12-28',
+    submittedDate: '2025-10-28',
     
     // REMOVED OLD FIELDS:
     // hasInsurance, insuranceProvider, insurancePolicyNumber
@@ -308,7 +308,7 @@ const moveRequests: MoveRequest[] = [
     residentPhone: '(555) 987-6543',
     
     // Move Details
-    moveDate: '2024-12-30', // TODAY
+    moveDate: '2025-11-03', // TODAY
     startTime: '09:00',
     endTime: '17:00',
     estimatedDuration: 8,
@@ -329,11 +329,11 @@ const moveRequests: MoveRequest[] = [
     depositPaymentMethod: 'bank', // Resident chose bank transfer
     depositAmount: 500,
     depositPaid: true, // ✅ PAID AND VERIFIED
-    depositPaidDate: '2024-12-22',
+    depositPaidDate: '2025-10-22',
     depositProofUrl: '/uploads/proof-move-004.pdf', // Bank transfer proof uploaded
     depositStatus: 'verified',
     depositVerifiedBy: 'Sarah Johnson',
-    depositVerifiedDate: '2024-12-23',
+    depositVerifiedDate: '2025-10-23',
     depositRefundAccount: undefined,
     
     // Building Access
@@ -347,14 +347,14 @@ const moveRequests: MoveRequest[] = [
     
     // Acceptance
     termsAccepted: true,
-    termsAcceptedDate: '2024-12-18',
+    termsAcceptedDate: '2025-10-18',
     
     // Approval
     approvedBy: 'Facilities Manager - Sarah Johnson',
-    approvedDate: '2024-12-19',
+    approvedDate: '2025-10-19',
     
     // Timestamps
-    submittedDate: '2024-12-18',
+    submittedDate: '2025-10-18',
     
     // REMOVED OLD FIELDS:
     // hasInsurance, insuranceProvider, insurancePolicyNumber
@@ -372,7 +372,7 @@ const moveRequests: MoveRequest[] = [
     residentPhone: '(555) 987-6543',
     
     // Move Details
-    moveDate: '2024-12-25', // Christmas Day - not allowed
+    moveDate: '2025-11-25', // Holiday move attempt
     startTime: '09:00',
     endTime: '15:00',
     estimatedDuration: 6,
@@ -407,15 +407,15 @@ const moveRequests: MoveRequest[] = [
     
     // Acceptance
     termsAccepted: true,
-    termsAcceptedDate: '2024-12-10',
+    termsAcceptedDate: '2025-10-10',
     
     // Approval
     approvedBy: 'Facilities Manager - Sarah Johnson',
-    approvedDate: '2024-12-11',
-    rejectionReason: 'Move requested on statutory holiday (Christmas Day). Building closed. Please reschedule to Dec 26 or later.',
+    approvedDate: '2025-10-11',
+    rejectionReason: 'Move requested on Day of Reconciliation (public holiday). Building closed. Please reschedule to Nov 26 or later.',
     
     // Timestamps
-    submittedDate: '2024-12-10',
+    submittedDate: '2025-10-10',
     
     // REMOVED OLD FIELDS:
     // hasInsurance, insuranceProvider, insurancePolicyNumber
@@ -424,52 +424,7 @@ const moveRequests: MoveRequest[] = [
 ];
 
 // ==================== FACILITY BOOKINGS ====================
-const facilityBookings: FacilityBooking[] = [
-  {
-    id: 'BOOK-001',
-    facilityName: 'Tennis Court 1',
-    facilityType: 'Tennis Court',
-    status: 'Confirmed',
-    residentName: 'Willow Legg',
-    residentUnit: 'Unit 111',
-    residentEmail: 'willow.legg@example.com',
-    residentPhone: '(555) 987-6543',
-    
-    bookingDate: '2024-12-15',
-    startTime: '15:00',
-    endTime: '17:00',
-    duration: 2,
-    
-    numberOfGuests: 2,
-    specialRequirements: 'Need tennis balls',
-    
-    submittedDate: '2024-12-01',
-    confirmedDate: '2024-12-02',
-    approvedBy: 'Facilities Manager - Sarah Johnson',
-  },
-  {
-    id: 'BOOK-002',
-    facilityName: 'Swimming Pool',
-    facilityType: 'Swimming Pool',
-    status: 'Completed',
-    residentName: 'Willow Legg',
-    residentUnit: 'Unit 111',
-    residentEmail: 'willow.legg@example.com',
-    residentPhone: '(555) 987-6543',
-    
-    bookingDate: '2024-12-05',
-    startTime: '14:00',
-    endTime: '16:00',
-    duration: 2,
-    
-    numberOfGuests: 4,
-    
-    submittedDate: '2024-11-28',
-    confirmedDate: '2024-11-29',
-    completedDate: '2024-12-05',
-    approvedBy: 'Facilities Manager - Sarah Johnson',
-  },
-];
+const facilityBookings: FacilityBooking[] = [];
 
 // ==================== ACTIVITY HISTORY ====================
 let activityHistory: ActivityItem[] = [
@@ -478,7 +433,7 @@ let activityHistory: ActivityItem[] = [
     type: 'move', 
     title: 'Move In - In Progress', 
     status: 'In Progress', 
-    date: 'Dec 30, 2024', 
+    date: 'Nov 3, 2025', 
     time: '9:00 AM',
     referenceId: 'MOVE-004'
   },
@@ -487,7 +442,7 @@ let activityHistory: ActivityItem[] = [
     type: 'move', 
     title: 'Move Out - Payment Pending', 
     status: 'Approved', 
-    date: 'Jan 15, 2025', 
+    date: 'Nov 15, 2025', 
     time: '8:00 AM',
     referenceId: 'MOVE-002'
   },
@@ -496,7 +451,7 @@ let activityHistory: ActivityItem[] = [
     type: 'move', 
     title: 'Move In - Awaiting Approval', 
     status: 'Pending', 
-    date: 'Feb 10, 2025', 
+    date: 'Nov 20, 2025', 
     time: '10:00 AM',
     referenceId: 'MOVE-003'
   },
@@ -505,7 +460,7 @@ let activityHistory: ActivityItem[] = [
     type: 'maintenance', 
     title: 'Faulty Light Switch', 
     status: 'Open', 
-    date: 'Dec 16, 2024',
+    date: 'Nov 12, 2025',
     referenceId: 'MNT-004'
   },
   { 
@@ -513,7 +468,7 @@ let activityHistory: ActivityItem[] = [
     type: 'maintenance', 
     title: 'Broken Door Handle', 
     status: 'Pending', 
-    date: 'Dec 15, 2024',
+    date: 'Nov 10, 2025',
     referenceId: 'MNT-003'
   },
   { 
@@ -521,7 +476,7 @@ let activityHistory: ActivityItem[] = [
     type: 'maintenance', 
     title: 'Water Pressure Issue', 
     status: 'Rejected', 
-    date: 'Dec 14, 2024',
+    date: 'Nov 18, 2025',
     referenceId: 'MNT-005'
   },
   { 
@@ -529,7 +484,7 @@ let activityHistory: ActivityItem[] = [
     type: 'maintenance', 
     title: 'AC Not Working', 
     status: 'In Progress', 
-    date: 'Dec 10, 2024', 
+    date: 'Nov 1, 2025', 
     assignee: 'Tech #3',
     referenceId: 'MNT-001'
   },
@@ -538,7 +493,7 @@ let activityHistory: ActivityItem[] = [
     type: 'move', 
     title: 'Move In - Completed', 
     status: 'Completed', 
-    date: 'Nov 28, 2024', 
+    date: 'Nov 1, 2025', 
     time: '9:00 AM',
     referenceId: 'MOVE-001'
   },
@@ -547,7 +502,7 @@ let activityHistory: ActivityItem[] = [
     type: 'maintenance', 
     title: 'Leaking Faucet', 
     status: 'Completed', 
-    date: 'Nov 20, 2024', 
+    date: 'Nov 7, 2025', 
     assignee: 'Tech #1',
     referenceId: 'MNT-002'
   },
@@ -556,7 +511,7 @@ let activityHistory: ActivityItem[] = [
     type: 'move', 
     title: 'Move Out - Rejected', 
     status: 'Rejected', 
-    date: 'Dec 25, 2024', 
+    date: 'Nov 25, 2025', 
     time: '9:00 AM',
     referenceId: 'MOVE-005'
   },

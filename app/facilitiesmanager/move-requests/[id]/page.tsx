@@ -238,35 +238,35 @@ export default function FMMoveRequestDetailPage() {
       <div className="relative z-10">
         <FMHeader currentPage="Move Requests" />
       
-      {/* Header */}
-      <div className="bg-gradient-to-r from-orange-600 to-orange-500 py-6 px-8 shadow-2xl">
-        <div className="max-w-7xl mx-auto">
+      {/* Header - FULL WIDTH */}
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 py-6 px-4 sm:px-6 lg:px-8 shadow-2xl">
+        <div className="w-full">
           <button
-            onClick={() => router.push('/facilitiesmanager')}
-            className="flex items-center gap-2 text-white hover:text-orange-100 transition-colors mb-4 text-base"
+            onClick={() => router.push('/facilitiesmanager/move-requests')}
+            className="flex items-center gap-2 text-white hover:text-purple-100 transition-colors mb-4 text-base font-semibold"
           >
             <ChevronLeft className="w-5 h-5" />
-            Back to Dashboard
+            Back to Move Requests
           </button>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shadow-lg">
                 <Truck className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-white text-3xl font-bold">{moveRequest.moveType} Request</h1>
-                <p className="text-orange-100 text-base">Move Request #{moveRequest.id} - {moveRequest.residentUnit}</p>
+                <h1 className="text-white text-2xl sm:text-3xl font-bold">{moveRequest.moveType} Request</h1>
+                <p className="text-purple-100 text-base">Move Request #{moveRequest.id} - {moveRequest.residentUnit}</p>
               </div>
             </div>
-            <div className={`${getStatusColor(moveRequest.status)} text-white px-6 py-3 rounded-xl font-bold text-lg`}>
+            <div className={`${getStatusColor(moveRequest.status)} text-white px-6 py-3 rounded-xl font-bold text-base sm:text-lg shadow-lg`}>
               {moveRequest.status}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      {/* Main Content - FULL WIDTH */}
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Left Column - Request Details */}
@@ -656,6 +656,44 @@ export default function FMMoveRequestDetailPage() {
                     <XCircle className="w-5 h-5" />
                     Reject
                   </button>
+                </div>
+              </motion.div>
+            )}
+            
+            {/* Status Management - For ALL other statuses */}
+            {moveRequest.status !== 'Pending' && moveRequest.status !== 'Payment Claimed' && (
+              <motion.div 
+                className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <h3 className="text-xl font-bold text-white mb-4">Change Status</h3>
+                <div className="space-y-3">
+                  <select
+                    value={moveRequest.status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value as MoveStatus;
+                      if (window.confirm(`Change status to "${newStatus}"?`)) {
+                        updateMoveRequest(moveRequest.id, { 
+                          status: newStatus,
+                          ...(newStatus === 'Completed' && { completedDate: new Date().toISOString().split('T')[0] })
+                        });
+                        addComment(moveRequest.id, 'move', `Status changed to: ${newStatus}`, 'fm');
+                      }
+                    }}
+                    className="w-full bg-gray-700 text-white text-base border-2 border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 font-semibold"
+                  >
+                    <option value="Approved">Approved</option>
+                    <option value="Deposit Pending">Deposit Pending</option>
+                    <option value="Deposit Verified">Deposit Verified</option>
+                    <option value="Fully Approved">Fully Approved</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                  <p className="text-gray-400 text-sm">Select a new status to update this request</p>
                 </div>
               </motion.div>
             )}

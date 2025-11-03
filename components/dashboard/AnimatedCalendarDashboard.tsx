@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, Clock, Wrench, TrendingUp, ChevronLeft, ChevronRight, Sparkles, Activity, ArrowUpDown, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,13 +24,14 @@ interface CalendarEvent {
 
 export function AnimatedCalendarDashboard() {
   const router = useRouter();
-  const { tickets, moveRequests, bookings, residentData, getComments, addComment, markCommentsAsRead, updateTicket, updateMoveRequest } = useData();
+  const { tickets, moveRequests, getComments, addComment, updateTicket, updateMoveRequest } = useData();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [commentText, setCommentText] = useState('');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'today' | 'upcoming' | 'pending'>('all');
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -45,15 +46,6 @@ export function AnimatedCalendarDashboard() {
 
   // Convert all data to calendar events
   const allEvents: CalendarEvent[] = [
-    ...bookings.map(b => ({
-      id: b.id,
-      type: 'booking' as const,
-      date: new Date(b.bookingDate),
-      title: b.facilityName,
-      time: `${b.startTime} - ${b.endTime}`,
-      resident: b.residentName,
-      status: b.status,
-    })),
     ...tickets.map(t => ({
       id: t.id,
       type: 'maintenance' as const,
@@ -115,9 +107,41 @@ export function AnimatedCalendarDashboard() {
   console.log('🎯 All Calendar Events:', allEvents.length);
   console.log('🎯 Move Events:', allEvents.filter(e => e.type === 'move'));
 
+  // Filter events based on active filter
+  const filteredEvents = useMemo(() => {
+    if (activeFilter === 'all') return allEvents;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    switch (activeFilter) {
+      case 'today':
+        return allEvents.filter(event => {
+          const eventDate = new Date(event.date);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate.getTime() === today.getTime();
+        });
+      
+      case 'upcoming':
+        return allEvents.filter(event => {
+          const eventDate = new Date(event.date);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate > today && eventDate <= nextWeek;
+        });
+      
+      case 'pending':
+        return allEvents.filter(event => event.status === 'Pending');
+      
+      default:
+        return allEvents;
+    }
+  }, [allEvents, activeFilter]);
+
   const getEventsForDate = (day: number): CalendarEvent[] => {
     const targetDate = new Date(year, month, day);
-    return allEvents.filter(event => {
+    return filteredEvents.filter(event => {
       const eventDate = new Date(event.date);
       return eventDate.getDate() === targetDate.getDate() &&
              eventDate.getMonth() === targetDate.getMonth() &&
@@ -125,25 +149,50 @@ export function AnimatedCalendarDashboard() {
     });
   };
 
-  const getTodayEventsCount = () => {
-    const today = new Date();
-    return allEvents.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.toDateString() === today.toDateString();
-    }).length;
-  };
-
-  const getUpcomingEventsCount = () => {
+  // Memoized stats calculations to prevent excessive re-renders
+  const stats = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return allEvents.filter(event => {
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    const todayItems = allEvents.filter(event => {
       const eventDate = new Date(event.date);
       eventDate.setHours(0, 0, 0, 0);
-      return eventDate >= today;
-    }).length;
-  };
-
-  const getPendingCount = () => residentData?.stats.pendingApprovals || 0;
+      return eventDate.getTime() === today.getTime();
+    });
+    
+    const upcomingItems = allEvents.filter(event => {
+      const eventDate = new Date(event.date);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate > today && eventDate <= nextWeek;
+    });
+    
+    const pendingTickets = tickets.filter(t => t.status === 'Pending');
+    const pendingMoves = moveRequests.filter(m => m.status === 'Pending');
+    const pendingTotal = pendingTickets.length + pendingMoves.length;
+    
+    // Calculate total of ALL request types (no bookings)
+    const totalAllRequests = tickets.length + moveRequests.length;
+    
+    const calculated = {
+      todayCount: todayItems.length,
+      upcomingCount: upcomingItems.length,
+      pendingCount: pendingTotal,
+      totalRequests: totalAllRequests, // Changed from totalTickets
+      pendingBreakdown: {
+        tickets: pendingTickets.length,
+        moves: pendingMoves.length
+      },
+      totalBreakdown: {
+        tickets: tickets.length,
+        moves: moveRequests.length
+      }
+    };
+    
+    console.log('📊 Stats calculated:', calculated);
+    return calculated;
+  }, [allEvents, tickets, moveRequests]);
 
   const previousMonth = () => {
     setIsAnimating(true);
@@ -255,13 +304,13 @@ export function AnimatedCalendarDashboard() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10 mb-4"
       >
         {[
-          { label: 'Today\'s Items', value: getTodayEventsCount(), icon: Calendar, color: 'from-blue-500 via-blue-600 to-cyan-500', pulse: true, onClick: () => {} },
-          { label: 'Upcoming', value: getUpcomingEventsCount(), icon: TrendingUp, color: 'from-green-500 via-green-600 to-emerald-500', pulse: false, onClick: () => {} },
-          { label: 'Pending Approval', value: getPendingCount(), icon: Clock, color: 'from-yellow-500 via-orange-500 to-orange-600', pulse: true, onClick: () => {} },
-          { label: 'Total Tickets', value: tickets.length, icon: Wrench, color: 'from-purple-500 via-purple-600 to-pink-500', pulse: false, onClick: () => router.push('/facilitiesmanager/maintenance') }
+          { label: 'Today\'s Items', value: stats.todayCount, icon: Calendar, color: 'from-blue-500 via-blue-600 to-cyan-500', pulse: true, filter: 'today' as const },
+          { label: 'Upcoming', value: stats.upcomingCount, icon: TrendingUp, color: 'from-green-500 via-green-600 to-emerald-500', pulse: false, filter: 'upcoming' as const },
+          { label: 'Pending Approval', value: stats.pendingCount, icon: Clock, color: 'from-yellow-500 via-orange-500 to-orange-600', pulse: true, filter: 'pending' as const },
+          { label: 'Total Requests', value: stats.totalRequests, icon: Activity, color: 'from-purple-500 via-purple-600 to-pink-500', pulse: false, filter: 'all' as const }
         ].map((stat, idx) => (
           <motion.div
             key={stat.label}
@@ -269,8 +318,10 @@ export function AnimatedCalendarDashboard() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: idx * 0.1, type: "spring", stiffness: 100 }}
             whileHover={{ scale: 1.05, y: -5, transition: { duration: 0.2 } }}
-            onClick={stat.onClick}
-            className={`bg-gradient-to-br ${stat.color} rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer`}
+            onClick={() => setActiveFilter(stat.filter)}
+            className={`bg-gradient-to-br ${stat.color} rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer ${
+              activeFilter === stat.filter ? 'ring-4 ring-white ring-opacity-60' : ''
+            }`}
           >
             <motion.div
               className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"
@@ -296,12 +347,86 @@ export function AnimatedCalendarDashboard() {
                 >
                   {stat.value}
                 </motion.p>
+                {stat.label === 'Total Requests' && stats.totalBreakdown && (
+                  <motion.p 
+                    className="text-xs opacity-75 mt-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: idx * 0.1 + 0.4 }}
+                  >
+                    {stats.totalBreakdown.tickets}M · {stats.totalBreakdown.moves}MV
+                  </motion.p>
+                )}
               </div>
               <motion.div
                 animate={stat.pulse ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <stat.icon className="w-14 h-14 opacity-80" strokeWidth={1.5} />
+              </motion.div>
+            </div>
+
+            <motion.div
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            >
+              <Sparkles className="w-5 h-5 text-white/60" />
+            </motion.div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Breakdown Stats Cards - By Type */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10"
+      >
+        {[
+          { label: 'Maintenance', value: stats.totalBreakdown.tickets, icon: Wrench, color: 'from-teal-500 via-teal-600 to-emerald-600', route: '/facilitiesmanager/maintenance' },
+          { label: 'Move Requests', value: stats.totalBreakdown.moves, icon: ArrowUpDown, color: 'from-cyan-500 via-cyan-600 to-blue-600', route: '/facilitiesmanager/move-requests' }
+        ].map((stat, idx) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.2 + idx * 0.1, type: "spring", stiffness: 100 }}
+            whileHover={{ scale: 1.05, y: -5, transition: { duration: 0.2 } }}
+            onClick={() => router.push(stat.route)}
+            className={`bg-gradient-to-br ${stat.color} rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer`}
+          >
+            <motion.div
+              className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            
+            <div className="flex items-center justify-between relative z-10">
+              <div>
+                <motion.p 
+                  className="text-sm opacity-90 mb-1 font-medium"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + idx * 0.1 + 0.1 }}
+                >
+                  {stat.label}
+                </motion.p>
+                <motion.p 
+                  className="text-4xl font-bold tracking-tight"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 + idx * 0.1 + 0.2, type: "spring", stiffness: 200 }}
+                >
+                  {stat.value}
+                </motion.p>
+              </div>
+              <motion.div
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.5 }}
+              >
+                <stat.icon className="w-12 h-12 opacity-80" strokeWidth={1.5} />
               </motion.div>
             </div>
 
@@ -352,6 +477,24 @@ export function AnimatedCalendarDashboard() {
             >
               {MONTHS[month]} {year}
             </motion.h2>
+            {activeFilter !== 'all' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/20"
+              >
+                <span className="text-cyan-300 text-sm font-semibold">
+                  Filtered: {activeFilter === 'today' ? 'Today' : activeFilter === 'upcoming' ? 'Upcoming' : 'Pending'}
+                  <span className="ml-2 bg-cyan-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">{filteredEvents.length}</span>
+                </span>
+                <button
+                  onClick={() => setActiveFilter('all')}
+                  className="text-white hover:text-cyan-300 transition-colors"
+                >
+                  ✕
+                </button>
+              </motion.div>
+            )}
           </div>
           
           <div className="flex items-center gap-3">
@@ -400,7 +543,7 @@ export function AnimatedCalendarDashboard() {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-7 gap-2">
           <AnimatePresence mode="popLayout">
             {calendarDays.map((day, idx) => {
               if (day === null) {
@@ -433,12 +576,12 @@ export function AnimatedCalendarDashboard() {
                   }}
                   whileTap={{ scale: 0.95 }}
                   className={`
-                    aspect-square rounded-2xl p-3 cursor-pointer transition-all duration-300 relative overflow-hidden
+                    aspect-square rounded-xl p-2 cursor-pointer transition-all duration-300 relative overflow-hidden
                     ${isCurrentDay 
-                      ? 'bg-gradient-to-br from-cyan-500 via-blue-500 to-blue-600 shadow-xl shadow-cyan-500/50 ring-4 ring-cyan-400/30' 
+                      ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 shadow-xl shadow-cyan-500/50 ring-2 ring-cyan-300' 
                       : hasItems
-                        ? 'bg-white/15 hover:bg-white/25 border border-white/20'
-                        : 'bg-white/5 hover:bg-white/10 border border-white/5'
+                        ? 'bg-gradient-to-br from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 border-2 border-cyan-400 shadow-lg'
+                        : 'bg-gradient-to-br from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 border-2 border-slate-600'
                     }
                   `}
                 >
@@ -461,7 +604,7 @@ export function AnimatedCalendarDashboard() {
 
                   <div className="flex flex-col h-full relative z-10">
                     <motion.span 
-                      className={`text-xl font-bold ${isCurrentDay ? 'text-white' : 'text-gray-100'}`}
+                      className={`text-lg font-bold mb-1 ${isCurrentDay ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-md'}`}
                       animate={isCurrentDay ? { scale: [1, 1.1, 1] } : {}}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
@@ -486,15 +629,15 @@ export function AnimatedCalendarDashboard() {
                               whileHover={{ scale: 1.05, x: 2 }}
                               onClick={(e) => handleEventClick(event, e)}
                               className={`
-                                text-[10px] px-2 py-1 rounded-lg font-medium backdrop-blur-sm flex items-center gap-1 relative
-                                ${event.status === 'Pending' ? 'bg-yellow-500/90 shadow-lg shadow-yellow-500/30 animate-pulse' : 
-                                  event.type === 'booking' ? 'bg-blue-500/90 shadow-lg shadow-blue-500/30' :
-                                  event.type === 'maintenance' ? 'bg-teal-500/90 shadow-lg shadow-teal-500/30' :
-                                  'bg-purple-500/90 shadow-lg shadow-purple-500/30'}
+                                text-xs px-2.5 py-1.5 rounded-md font-bold backdrop-blur-sm flex items-center gap-1.5 relative text-white shadow-lg
+                                ${event.status === 'Pending' ? 'bg-yellow-500 shadow-yellow-500/50 ring-2 ring-yellow-300 animate-pulse' : 
+                                  event.type === 'booking' ? 'bg-blue-600 shadow-blue-500/50 ring-2 ring-blue-300' :
+                                  event.type === 'maintenance' ? 'bg-teal-600 shadow-teal-500/50 ring-2 ring-teal-300' :
+                                  'bg-purple-600 shadow-purple-500/50 ring-2 ring-purple-300'}
                               `}
                             >
-                              <Icon className="w-2.5 h-2.5" />
-                              <span className="truncate flex-1">{event.title}</span>
+                              <Icon className="w-3.5 h-3.5" />
+                              <span className="truncate flex-1 text-xs">{event.title}</span>
                               {event.unreadComments && event.unreadComments > 0 && (
                                 <span className="bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[8px] font-bold">
                                   {event.unreadComments}
@@ -505,7 +648,7 @@ export function AnimatedCalendarDashboard() {
                         })}
                         {dayEvents.length > 3 && (
                           <motion.div 
-                            className="text-[10px] text-cyan-300 text-center font-semibold bg-cyan-500/20 rounded-lg py-1 backdrop-blur-sm"
+                            className="text-xs text-cyan-100 text-center font-bold bg-cyan-600/80 rounded-md py-1 backdrop-blur-sm shadow-lg"
                             animate={{ scale: [1, 1.05, 1] }}
                             transition={{ duration: 1.5, repeat: Infinity }}
                           >

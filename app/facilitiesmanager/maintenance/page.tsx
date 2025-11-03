@@ -5,9 +5,6 @@ import { useRouter } from 'next/navigation';
 import { FMHeader } from '@/components/fm/FMHeader';
 import { useData } from '@/contexts/DataContext';
 import { 
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
   Wrench,
   Clock,
   CheckCircle,
@@ -96,36 +93,12 @@ const statusConfig = {
 export default function MaintenanceCalendarDashboard() {
   const router = useRouter();
   const { tickets, isLoading } = useData();
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
 
   // Use tickets directly from DataContext
   const maintenanceData = tickets;
-
-  // Generate calendar days for current month
-  const calendarDays = useMemo(() => {
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const days = [];
-    
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-    
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(year, month, i));
-    }
-    
-    return days;
-  }, [selectedDate]);
 
   // Filter maintenance requests
   const filteredRequests = useMemo(() => {
@@ -141,40 +114,18 @@ export default function MaintenanceCalendarDashboard() {
     });
   }, [maintenanceData, selectedStatus, selectedPriority, searchQuery]);
 
-  // Get requests for a specific date
-  const getRequestsForDate = (date: Date | null) => {
-    if (!date) return [];
-    const dateStr = date.toISOString().split('T')[0];
-    return filteredRequests.filter(req => req.dateSubmitted === dateStr);
-  };
-
-  // Calculate statistics
+  // Calculate statistics from ALL tickets (not filtered)
   const stats = useMemo(() => {
     return {
-      total: filteredRequests.length,
-      open: filteredRequests.filter(r => r.status === 'Open').length,
-      inProgress: filteredRequests.filter(r => r.status === 'In Progress').length,
-      pending: filteredRequests.filter(r => r.status === 'Pending').length,
-      completed: filteredRequests.filter(r => r.status === 'Completed').length
+      total: maintenanceData.length,
+      open: maintenanceData.filter(r => r.status === 'Open').length,
+      inProgress: maintenanceData.filter(r => r.status === 'In Progress').length,
+      pending: maintenanceData.filter(r => r.status === 'Pending').length,
+      completed: maintenanceData.filter(r => r.status === 'Completed').length,
+      rejected: maintenanceData.filter(r => r.status === 'Rejected').length,
+      cancelled: maintenanceData.filter(r => r.status === 'Cancelled').length
     };
-  }, [filteredRequests]);
-
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setSelectedDate(prev => {
-      const newDate = new Date(prev);
-      if (direction === 'prev') {
-        newDate.setMonth(newDate.getMonth() - 1);
-      } else {
-        newDate.setMonth(newDate.getMonth() + 1);
-      }
-      return newDate;
-    });
-  };
-
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  }, [maintenanceData]);
 
   if (isLoading) {
     return (
@@ -209,16 +160,23 @@ export default function MaintenanceCalendarDashboard() {
       <div className="bg-gradient-to-r from-cyan-600 via-cyan-700 to-teal-700 py-6 px-8 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Maintenance Request Calendar</h2>
+            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Maintenance Requests</h2>
             <p className="text-white text-base drop-shadow">Track and manage all maintenance requests</p>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-5 gap-4">
-          <div className="bg-white/25 backdrop-blur-sm rounded-xl p-4 border border-white/40 hover:bg-white/35 transition-all cursor-pointer group">
+        <div className="grid grid-cols-7 gap-4">
+          <div 
+            onClick={() => setSelectedStatus('all')}
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'all'
+                ? 'bg-white/40 border-white ring-2 ring-white'
+                : 'bg-white/25 border-white/40 hover:bg-white/35'
+            }`}
+          >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-white font-semibold drop-shadow">Total Requests</p>
+              <p className="text-white font-semibold drop-shadow">All</p>
               <Wrench className="w-6 h-6 text-white drop-shadow group-hover:rotate-12 transition-transform" />
             </div>
             <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.total}</p>
@@ -226,7 +184,11 @@ export default function MaintenanceCalendarDashboard() {
 
           <div 
             onClick={() => setSelectedStatus('Open')}
-            className="bg-red-600/30 backdrop-blur-sm rounded-xl p-4 border border-red-400/50 hover:bg-red-600/40 transition-all cursor-pointer group"
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'Open'
+                ? 'bg-red-600/50 border-red-300 ring-2 ring-red-300'
+                : 'bg-red-600/30 border-red-400/50 hover:bg-red-600/40'
+            }`}
           >
             <div className="flex items-center justify-between mb-2">
               <p className="text-white font-semibold drop-shadow">Open</p>
@@ -237,7 +199,11 @@ export default function MaintenanceCalendarDashboard() {
 
           <div 
             onClick={() => setSelectedStatus('In Progress')}
-            className="bg-yellow-600/30 backdrop-blur-sm rounded-xl p-4 border border-yellow-400/50 hover:bg-yellow-600/40 transition-all cursor-pointer group"
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'In Progress'
+                ? 'bg-yellow-600/50 border-yellow-300 ring-2 ring-yellow-300'
+                : 'bg-yellow-600/30 border-yellow-400/50 hover:bg-yellow-600/40'
+            }`}
           >
             <div className="flex items-center justify-between mb-2">
               <p className="text-white font-semibold drop-shadow">In Progress</p>
@@ -248,7 +214,11 @@ export default function MaintenanceCalendarDashboard() {
 
           <div 
             onClick={() => setSelectedStatus('Pending')}
-            className="bg-blue-600/30 backdrop-blur-sm rounded-xl p-4 border border-blue-400/50 hover:bg-blue-600/40 transition-all cursor-pointer group"
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'Pending'
+                ? 'bg-blue-600/50 border-blue-300 ring-2 ring-blue-300'
+                : 'bg-blue-600/30 border-blue-400/50 hover:bg-blue-600/40'
+            }`}
           >
             <div className="flex items-center justify-between mb-2">
               <p className="text-white font-semibold drop-shadow">Pending</p>
@@ -259,13 +229,47 @@ export default function MaintenanceCalendarDashboard() {
 
           <div 
             onClick={() => setSelectedStatus('Completed')}
-            className="bg-green-600/30 backdrop-blur-sm rounded-xl p-4 border border-green-400/50 hover:bg-green-600/40 transition-all cursor-pointer group"
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'Completed'
+                ? 'bg-green-600/50 border-green-300 ring-2 ring-green-300'
+                : 'bg-green-600/30 border-green-400/50 hover:bg-green-600/40'
+            }`}
           >
             <div className="flex items-center justify-between mb-2">
               <p className="text-white font-semibold drop-shadow">Completed</p>
               <CheckCircle className="w-6 h-6 text-white drop-shadow group-hover:scale-110 transition-transform" />
             </div>
             <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.completed}</p>
+          </div>
+
+          <div 
+            onClick={() => setSelectedStatus('Rejected')}
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'Rejected'
+                ? 'bg-gray-600/50 border-gray-300 ring-2 ring-gray-300'
+                : 'bg-gray-600/30 border-gray-400/50 hover:bg-gray-600/40'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-white font-semibold drop-shadow">Rejected</p>
+              <XCircle className="w-6 h-6 text-white drop-shadow group-hover:rotate-180 transition-transform" />
+            </div>
+            <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.rejected}</p>
+          </div>
+
+          <div 
+            onClick={() => setSelectedStatus('Cancelled')}
+            className={`backdrop-blur-sm rounded-xl p-4 border transition-all cursor-pointer group ${
+              selectedStatus === 'Cancelled'
+                ? 'bg-slate-600/50 border-slate-300 ring-2 ring-slate-300'
+                : 'bg-slate-600/30 border-slate-400/50 hover:bg-slate-600/40'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-white font-semibold drop-shadow">Cancelled</p>
+              <XCircle className="w-6 h-6 text-white drop-shadow group-hover:scale-75 transition-transform" />
+            </div>
+            <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.cancelled}</p>
           </div>
         </div>
       </div>
@@ -306,6 +310,8 @@ export default function MaintenanceCalendarDashboard() {
                 <option value="In Progress">In Progress</option>
                 <option value="Pending">Pending</option>
                 <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Cancelled">Cancelled</option>
               </select>
             </div>
 
@@ -327,31 +333,7 @@ export default function MaintenanceCalendarDashboard() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={`px-6 py-2 rounded-lg font-medium transition-all ${
-                  viewMode === 'calendar' 
-                    ? 'bg-cyan-500 text-white' 
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                <Calendar className="inline w-4 h-4 mr-2" />
-                Calendar View
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-6 py-2 rounded-lg font-medium transition-all ${
-                  viewMode === 'list' 
-                    ? 'bg-cyan-500 text-white' 
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                List View
-              </button>
-            </div>
-
+          <div className="flex items-center justify-end mt-4 pt-4 border-t border-gray-700">
             <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 transition-all">
               <Download className="w-4 h-4" />
               Export Report
@@ -359,99 +341,8 @@ export default function MaintenanceCalendarDashboard() {
           </div>
         </div>
 
-        {viewMode === 'calendar' ? (
-          <>
-            {/* Calendar Navigation */}
-            <div className="bg-gray-800 rounded-xl p-6 mb-6 border border-gray-700 shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <button
-                  onClick={() => navigateMonth('prev')}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-lg font-semibold hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                  Previous
-                </button>
-
-                <h3 className="text-3xl font-bold text-white">
-                  {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}
-                </h3>
-
-                <button
-                  onClick={() => navigateMonth('next')}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-lg font-semibold hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  Next
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-2">
-                
-                {dayNames.map(day => (
-                  <div key={day} className="text-center py-3 text-cyan-400 font-bold text-lg border-b-2 border-cyan-500/30">
-                    {day}
-                  </div>
-                ))}
-
-                {calendarDays.map((date, index) => {
-                  if (!date) {
-                    return <div key={`empty-${index}`} className="min-h-[140px] bg-gray-900/50 rounded-lg" />;
-                  }
-
-                  const requests = getRequestsForDate(date);
-                  const isToday = date.toDateString() === new Date().toDateString();
-
-                  return (
-                    <div
-                      key={index}
-                      className={`min-h-[140px] p-3 rounded-lg border-2 transition-all hover:shadow-lg hover:scale-105 cursor-pointer ${
-                        isToday 
-                          ? 'bg-cyan-500/20 border-cyan-400 shadow-lg shadow-cyan-500/50' 
-                          : 'bg-gray-900/50 border-gray-700 hover:border-cyan-500/50'
-                      }`}
-                    >
-                      <div className={`text-right mb-2 font-bold ${
-                        isToday ? 'text-cyan-300 text-2xl' : 'text-gray-400 text-lg'
-                      }`}>
-                        {date.getDate()}
-                      </div>
-
-                      <div className="space-y-1">
-                        {requests.slice(0, 3).map(request => {
-                          const config = statusConfig[request.status as keyof typeof statusConfig];
-                          const Icon = config.icon;
-                          
-                          return (
-                            <div
-                              key={request.id}
-                              className={`p-2 rounded text-xs font-medium ${config.lightColor} ${config.textColor} border ${config.borderColor} hover:scale-105 transition-all animate-fade-in`}
-                              title={`${request.title} - ${request.residentUnit}`}
-                            >
-                              <div className="flex items-center gap-1">
-                                <Icon className="w-3 h-3 flex-shrink-0" />
-                                <span className="truncate">{request.title}</span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        
-                        {requests.length > 3 && (
-                          <div className="text-center text-xs text-cyan-400 font-bold mt-1">
-                            +{requests.length - 3} more
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* List View */}
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-xl">
+        {/* List View */}
+        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-xl">
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <Wrench className="w-6 h-6 text-cyan-400" />
                 All Maintenance Requests ({filteredRequests.length})
@@ -465,6 +356,7 @@ export default function MaintenanceCalendarDashboard() {
                   return (
                     <div
                       key={request.id}
+                      onClick={() => router.push(`/facilitiesmanager/maintenance/${request.id}`)}
                       className="bg-gray-900 rounded-lg p-6 border-l-4 hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02] animate-fade-in"
                       style={{ borderLeftColor: config.color.replace('bg-', '') }}
                     >
@@ -540,8 +432,6 @@ export default function MaintenanceCalendarDashboard() {
                 )}
               </div>
             </div>
-          </>
-        )}
 
       </div>
 
