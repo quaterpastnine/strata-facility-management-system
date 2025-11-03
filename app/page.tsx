@@ -10,8 +10,19 @@ export default function LandingPage() {
   const quote = getQuoteOfTheDay();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-3 sm:p-6 overflow-x-hidden">
-      <div className="text-center max-w-6xl mx-auto w-full">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-3 sm:p-6 overflow-x-hidden relative">
+      
+      {/* Background Image */}
+      <div 
+        className="fixed inset-0 opacity-30 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url("/background.jpg")',
+          zIndex: 0
+        }}
+      />
+      
+      {/* Content */}
+      <div className="text-center max-w-6xl mx-auto w-full relative z-10">
         {/* Logo */}
         <div className="mb-6 sm:mb-8 md:mb-10">
           <Image
@@ -57,8 +68,14 @@ export default function LandingPage() {
             className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 transition-all transform w-full text-left"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="bg-white/20 rounded-full p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
-                <Users className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
+              <div className="bg-white/20 rounded-full p-2 sm:p-2.5 md:p-3 mb-4 sm:mb-5 md:mb-6 overflow-hidden border-4 border-white/30">
+                <Image
+                  src="/willow.jpg"
+                  alt="Resident"
+                  width={128}
+                  height={128}
+                  className="object-cover w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full"
+                />
               </div>
               
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
@@ -82,8 +99,14 @@ export default function LandingPage() {
             className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 transition-all transform w-full text-left"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="bg-white/20 rounded-full p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
-                <Building2 className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
+              <div className="bg-white/20 rounded-full p-2 sm:p-2.5 md:p-3 mb-4 sm:mb-5 md:mb-6 overflow-hidden border-4 border-white/30">
+                <Image
+                  src="/fmavatar.jpg"
+                  alt="Facilities Manager"
+                  width={128}
+                  height={128}
+                  className="object-cover w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full"
+                />
               </div>
               
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">

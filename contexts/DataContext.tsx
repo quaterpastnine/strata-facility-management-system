@@ -27,6 +27,13 @@ interface DataContextType {
   createMoveRequest: (data: Omit<MoveRequest, 'id' | 'submittedDate' | 'residentName' | 'residentUnit' | 'residentEmail' | 'residentPhone'>) => MoveRequest;
   updateMoveRequest: (id: string, updates: Partial<MoveRequest>) => void;
   
+  // NEW: Deposit Workflow Functions
+  setDepositInstructions: (moveId: string, method: 'bank' | 'cash', amount: number, bankDetails?: string, cashDate?: string) => void;
+  confirmDepositPaid: (moveId: string, paidDate: string, proofUrl?: string) => void;
+  verifyDepositReceived: (moveId: string) => void;
+  setInsuranceSelection: (moveId: string, hasInsurance: boolean) => void;
+  createCashReceipt: (receipt: Omit<import('@/lib/types').CashReceipt, 'id' | 'createdAt' | 'createdBy'>) => void;
+  
   // Facility Bookings
   bookings: FacilityBooking[];
   
@@ -90,13 +97,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         
         // Fetch all data from API (hardcoded mock data)
-        const [ticketsData, moveData, bookingsData, residentInfo, activity] = await Promise.all([
+        const [ticketsResponse, moveData, bookingsData, residentInfo, activity] = await Promise.all([
           fetch('/api/maintenance').then(r => r.json()),
           fetch('/api/move-requests').then(r => r.json()),
           fetch('/api/bookings').then(r => r.json()),
           fetch('/api/resident').then(r => r.json()),
           fetch('/api/activity').then(r => r.json()),
         ]);
+        
+        // Extract tickets array from response
+        const ticketsData = ticketsResponse.tickets || ticketsResponse;
         
         // Store in browser memory for the session
         setTickets(ticketsData);
@@ -229,6 +239,135 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ==================== DEPOSIT WORKFLOW FUNCTIONS ====================
+  
+  // FM sets deposit payment instructions after approving move request
+  const setDepositInstructions = (
+    moveId: string, 
+    method: 'bank' | 'cash', 
+    amount: number, 
+    bankDetails?: string, 
+    cashDate?: string
+  ): void => {
+    const updates: Partial<MoveRequest> = {
+      status: 'Deposit Pending',
+      depositPaymentMethod: method,
+      depositAmount: amount,
+      depositStatus: 'awaiting_payment',
+    };
+    
+    if (method === 'bank' && bankDetails) {
+      updates.depositBankDetails = bankDetails;
+    }
+    
+    if (method === 'cash' && cashDate) {
+      updates.depositCashAppointmentDate = cashDate;
+    }
+    
+    updateMoveRequest(moveId, updates);
+    
+    // Add automatic comment
+    const methodText = method === 'bank' ? 'Bank Transfer' : 'Cash Payment';
+    const detailsText = method === 'bank' 
+      ? `Bank details: ${bankDetails}` 
+      : `Appointment: ${cashDate}`;
+    addComment(
+      moveId, 
+      'move', 
+      `Deposit instructions sent: ${methodText} - R${amount}. ${detailsText}`, 
+      'fm'
+    );
+  };
+  
+  // Resident confirms payment has been made
+  const confirmDepositPaid = (moveId: string, paidDate: string, proofUrl?: string): void => {
+    const updates: Partial<MoveRequest> = {
+      status: 'Payment Claimed',
+      depositPaidDate: paidDate,
+      depositStatus: 'payment_claimed',
+    };
+    
+    if (proofUrl) {
+      updates.depositProofUrl = proofUrl;
+    }
+    
+    updateMoveRequest(moveId, updates);
+    
+    // Add comment
+    const proofText = proofUrl ? ' (Proof uploaded)' : '';
+    addComment(
+      moveId, 
+      'move', 
+      `Resident confirmed payment made on ${paidDate}${proofText}. Awaiting FM verification.`, 
+      'resident'
+    );
+  };
+  
+  // FM verifies payment has been received
+  const verifyDepositReceived = (moveId: string): void => {
+    updateMoveRequest(moveId, {
+      status: 'Deposit Verified',
+      depositPaid: true,
+      depositStatus: 'verified',
+      depositVerifiedBy: 'Facilities Manager',
+      depositVerifiedDate: new Date().toISOString().split('T')[0],
+    });
+    
+    // Add comment
+    addComment(
+      moveId, 
+      'move', 
+      'Payment verified and received. Please select insurance option to complete approval.', 
+      'fm'
+    );
+  };
+  
+  // Resident selects insurance (required step)
+  const setInsuranceSelection = (moveId: string, hasInsurance: boolean): void => {
+    updateMoveRequest(moveId, {
+      status: 'Fully Approved',
+      insuranceSelected: hasInsurance,
+      insuranceSelectionDate: new Date().toISOString().split('T')[0],
+    });
+    
+    // Add comment
+    const insuranceText = hasInsurance ? 'YES - Will provide insurance' : 'NO - Will not provide insurance';
+    addComment(
+      moveId, 
+      'move', 
+      `Insurance selection: ${insuranceText}. Move request is now fully approved!`, 
+      'resident'
+    );
+  };
+  
+  // FM creates cash receipt after receiving cash payment
+  const createCashReceipt = (receipt: Omit<import('@/lib/types').CashReceipt, 'id' | 'createdAt' | 'createdBy'>): void => {
+    // Update move request with cash receipt details
+    updateMoveRequest(receipt.moveRequestId, {
+      cashReceiptNumber: receipt.receiptNumber,
+      cashReceiptDate: receipt.date,
+      cashReceiptAmount: receipt.amount,
+      cashReceiptReceivedBy: receipt.receivedBy,
+      cashReceiptNotes: receipt.notes,
+      paymentMethod: 'Cash',
+      depositPaid: true,
+      status: 'Deposit Verified',
+      depositStatus: 'verified',
+      depositVerifiedBy: receipt.receivedBy,
+      depositVerifiedDate: receipt.date,
+    });
+    
+    // Add comment
+    addComment(
+      receipt.moveRequestId,
+      'move',
+      `Cash receipt created: ${receipt.receiptNumber}. Payment of R${receipt.amount.toFixed(2)} received by ${receipt.receivedBy}. Please select insurance option to complete approval.`,
+      'fm'
+    );
+    
+    console.log('💵 Cash receipt created:', receipt.receiptNumber);
+  };
+
   // ==================== COMMENT FUNCTIONS ====================
   
   const getComments = (ticketId: string, ticketType: 'maintenance' | 'move'): Comment[] => {
@@ -263,6 +402,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     getMoveRequestById,
     createMoveRequest,
     updateMoveRequest,
+    setDepositInstructions,
+    confirmDepositPaid,
+    verifyDepositReceived,
+    setInsuranceSelection,
+    createCashReceipt,
     bookings,
     residentData,
     activityHistory,

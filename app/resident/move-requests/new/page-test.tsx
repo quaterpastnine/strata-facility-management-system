@@ -55,6 +55,82 @@ interface FormData {
   termsAccepted: boolean;
 }
 
+// TermsModal Component - defined outside to prevent recreation on each render
+function TermsModal({ 
+  showTerms, 
+  setShowTerms, 
+  depositAmount 
+}: { 
+  showTerms: boolean;
+  setShowTerms: (show: boolean) => void;
+  depositAmount: number;
+}) {
+  if (!showTerms) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setShowTerms(false)}>
+      <div className="bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 flex items-center justify-between">
+          <h3 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+            <FileText className="w-8 h-8 text-orange-400" />
+            Terms and Conditions
+          </h3>
+          <button onClick={() => setShowTerms(false)} className="text-gray-400 hover:text-white">
+            <XCircle className="w-8 h-8" />
+          </button>
+        </div>
+        
+        <div className="p-6 space-y-6 text-gray-300 text-base sm:text-lg leading-relaxed">
+          <div>
+            <h4 className="text-white font-bold text-xl mb-3">1. Building Access</h4>
+            <p>• All movers must check in at security and receive temporary access cards.</p>
+            <p>• Service elevator must be reserved in advance and used exclusively for your move.</p>
+            <p>• Loading dock time slots are strictly enforced.</p>
+          </div>
+          
+          <div>
+            <h4 className="text-white font-bold text-xl mb-3">2. Liability and Insurance</h4>
+            <p>• You are responsible for any damage to building property, elevators, or common areas.</p>
+            <p>• Moving company must have valid liability insurance if using professional movers.</p>
+            <p>• Security deposit will be withheld to cover any damages.</p>
+          </div>
+          
+          <div>
+            <h4 className="text-white font-bold text-xl mb-3">3. Security Deposit</h4>
+            <p>• A refundable deposit of R{depositAmount} is required.</p>
+            <p>• Deposit will be refunded within 7 business days if no damage occurs.</p>
+            <p>• Any deductions will be itemized and documented with photos.</p>
+          </div>
+          
+          <div>
+            <h4 className="text-white font-bold text-xl mb-3">4. Building Rules</h4>
+            <p>• Moves are only allowed Monday-Saturday, 8 AM - 6 PM (unless special permission granted).</p>
+            <p>• Common areas must not be blocked for more than 15 minutes.</p>
+            <p>• All furniture must be properly wrapped to prevent wall damage.</p>
+            <p>• Maximum 5 movers allowed in service elevator at one time.</p>
+          </div>
+          
+          <div>
+            <h4 className="text-white font-bold text-xl mb-3">5. Cancellation Policy</h4>
+            <p>• Must provide 48 hours notice for cancellation.</p>
+            <p>• Late cancellations may result in loss of deposit.</p>
+            <p>• Rescheduling subject to availability.</p>
+          </div>
+        </div>
+        
+        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6">
+          <button
+            onClick={() => setShowTerms(false)}
+            className="w-full px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold text-lg transition-all"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function NewMoveRequest() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
@@ -87,6 +163,11 @@ export default function NewMoveRequest() {
     oversizedItemDetails: '',
     termsAccepted: false,
   });
+
+  // Minimum move date (48 hours from now) - initialized once during mount
+  const [minMoveDate] = useState(() => 
+    new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString().split('T')[0]
+  );
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
@@ -172,73 +253,6 @@ export default function NewMoveRequest() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const TermsModal = () => {
-    if (!showTerms) return null;
-    
-    return (
-      <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setShowTerms(false)}>
-        <div className="bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-          <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 flex items-center justify-between">
-            <h3 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
-              <FileText className="w-8 h-8 text-orange-400" />
-              Terms and Conditions
-            </h3>
-            <button onClick={() => setShowTerms(false)} className="text-gray-400 hover:text-white">
-              <XCircle className="w-8 h-8" />
-            </button>
-          </div>
-          
-          <div className="p-6 space-y-6 text-gray-300 text-base sm:text-lg leading-relaxed">
-            <div>
-              <h4 className="text-white font-bold text-xl mb-3">1. Building Access</h4>
-              <p>• All movers must check in at security and receive temporary access cards.</p>
-              <p>• Service elevator must be reserved in advance and used exclusively for your move.</p>
-              <p>• Loading dock time slots are strictly enforced.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-xl mb-3">2. Liability and Insurance</h4>
-              <p>• You are responsible for any damage to building property, elevators, or common areas.</p>
-              <p>• Moving company must have valid liability insurance if using professional movers.</p>
-              <p>• Security deposit will be withheld to cover any damages.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-xl mb-3">3. Security Deposit</h4>
-              <p>• A refundable deposit of R{formData.depositAmount} is required.</p>
-              <p>• Deposit will be refunded within 7 business days if no damage occurs.</p>
-              <p>• Any deductions will be itemized and documented with photos.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-xl mb-3">4. Building Rules</h4>
-              <p>• Moves are only allowed Monday-Saturday, 8 AM - 6 PM (unless special permission granted).</p>
-              <p>• Common areas must not be blocked for more than 15 minutes.</p>
-              <p>• All furniture must be properly wrapped to prevent wall damage.</p>
-              <p>• Maximum 5 movers allowed in service elevator at one time.</p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-xl mb-3">5. Cancellation Policy</h4>
-              <p>• Must provide 48 hours notice for cancellation.</p>
-              <p>• Late cancellations may result in loss of deposit.</p>
-              <p>• Rescheduling subject to availability.</p>
-            </div>
-          </div>
-          
-          <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6">
-            <button
-              onClick={() => setShowTerms(false)}
-              className="w-full px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold text-lg transition-all"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <PageLayout>
       <ResidentHeader currentPage="New Move Request" />
@@ -261,7 +275,11 @@ export default function NewMoveRequest() {
         }
       />
 
-      <TermsModal />
+      <TermsModal 
+        showTerms={showTerms}
+        setShowTerms={setShowTerms}
+        depositAmount={formData.depositAmount}
+      />
 
       {/* Progress Steps - Desktop */}
       <div className="hidden md:block px-3 sm:px-6 md:px-8 pb-6">
@@ -351,7 +369,7 @@ export default function NewMoveRequest() {
                       type="date"
                       value={formData.moveDate}
                       onChange={(e) => updateFormData('moveDate', e.target.value)}
-                      min={new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                      min={minMoveDate}
                       className="w-full pl-20 pr-6 py-6 bg-gray-900 text-white rounded-xl border-2 border-gray-600 focus:border-orange-500 focus:outline-none text-xl sm:text-2xl md:text-3xl appearance-none cursor-pointer"
                       style={{
                         colorScheme: 'dark',

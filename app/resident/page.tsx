@@ -119,7 +119,7 @@ export default function ResidentDashboard() {
 
         {/* FM Notifications Bar - SOLID BACKGROUND for better visibility */}
         <motion.div 
-          className="mb-6 bg-gradient-to-r from-teal-800 to-cyan-800 border-2 border-cyan-400 rounded-lg p-4 shadow-xl"
+          className="mb-6 bg-gradient-to-r from-emerald-800 to-emerald-900 border-2 border-emerald-400 rounded-lg p-4 shadow-xl"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -191,7 +191,7 @@ export default function ResidentDashboard() {
                   >
                     <div className="flex items-center gap-3 flex-1">
                       {update.type === 'maintenance' ? (
-                        <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
                           <Wrench className="w-5 h-5 text-white" />
                         </div>
                       ) : (
@@ -268,7 +268,7 @@ export default function ResidentDashboard() {
           {/* Maintenance Tile */}
           <motion.button
             onClick={() => router.push('/resident/maintenance')}
-            className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-xl p-6 text-white cursor-pointer hover:from-teal-500 hover:to-teal-600 transition-all shadow-xl text-left border-2 border-teal-400 min-h-[240px] flex flex-col"
+            className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl p-6 text-white cursor-pointer hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-xl text-left border-2 border-emerald-400 min-h-[240px] flex flex-col"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.4 }}
@@ -284,7 +284,7 @@ export default function ResidentDashboard() {
               <div className="text-4xl font-bold mb-2">
                 {maintenanceCount}
               </div>
-              <div className="text-base text-teal-100">Active Tickets</div>
+              <div className="text-base text-emerald-100">Active Tickets</div>
             </div>
             {/* Status indicator with solid background */}
             {maintenanceInProgress > 0 && (
@@ -294,7 +294,7 @@ export default function ResidentDashboard() {
               </div>
             )}
             {maintenancePending > 0 && maintenanceInProgress === 0 && (
-              <div className="text-sm text-white mt-3 flex items-center gap-2 bg-teal-800 rounded-lg p-2">
+              <div className="text-sm text-white mt-3 flex items-center gap-2 bg-emerald-800 rounded-lg p-2">
                 <Clock className="w-4 h-4" />
                 {maintenancePending} pending FM review
               </div>
@@ -356,7 +356,7 @@ export default function ResidentDashboard() {
                   <div className="flex items-center gap-3">
                     {/* Icon with solid background */}
                     {activity.type === 'maintenance' && (
-                      <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
                         <Wrench className="w-5 h-5 text-white" />
                       </div>
                     )}
@@ -461,7 +461,7 @@ export default function ResidentDashboard() {
             <div className="mt-6 space-y-2">
               <button
                 onClick={() => router.push('/resident/maintenance/new')}
-                className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
               >
                 <Wrench className="w-5 h-5" />
                 Report Maintenance Issue

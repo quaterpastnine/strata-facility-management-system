@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, Plus, Calendar, Clock, Truck, MapPin, DollarSign, ChevronRight, CheckCircle, MessageSquare, User } from 'lucide-react';
+import { Building2, Plus, Calendar, Clock, Truck, MapPin, DollarSign, ChevronRight, CheckCircle, MessageSquare, User, Filter, Download } from 'lucide-react';
 import { PageLayout, ResidentHeader, PageHeader } from '@/components/resident';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { SearchFilterBar } from '@/components/ui/SearchFilter';
@@ -10,29 +10,17 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useSearchFilter } from '@/lib/hooks';
 import { getMoveStatusConfig } from '@/lib/statusConfig';
 import { filterBySearch, formatCurrency } from '@/lib/constants';
-import { getMoveRequests } from '@/lib/mockData';
 import type { MoveRequest, MoveStatus } from '@/lib/types';
+import { useData } from '@/contexts/DataContext';
 
 const MOVE_STATUSES: MoveStatus[] = ['Pending', 'Approved', 'In Progress', 'Completed', 'Rejected', 'Cancelled'];
 
 export default function MoveRequestsPage() {
   const router = useRouter();
-  const [moveRequests, setMoveRequests] = useState<MoveRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { moveRequests, isLoading } = useData();
   
   // Search and filter state
   const { searchQuery, setSearchQuery, filterStatus, setFilterStatus } = useSearchFilter<MoveStatus>();
-
-  // Load move requests on mount
-  useEffect(() => {
-    async function loadMoveRequests() {
-      setIsLoading(true);
-      const requests = await getMoveRequests();
-      setMoveRequests(requests);
-      setIsLoading(false);
-    }
-    loadMoveRequests();
-  }, []);
 
   // Memoized filtered results
   const filteredRequests = useMemo(() => {
@@ -195,6 +183,18 @@ export default function MoveRequestsPage() {
                             FM Response
                           </span>
                         )}
+                        {/* Urgent indicator for upcoming moves */}
+                        {(() => {
+                          const daysUntilMove = Math.ceil((new Date(request.moveDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                          if (daysUntilMove <= 3 && daysUntilMove >= 0) {
+                            return (
+                              <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full animate-pulse">
+                                {daysUntilMove === 0 ? 'Today!' : `${daysUntilMove} days`}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                       <p className="text-gray-300 text-lg md:text-xl mb-4 font-semibold">{request.residentUnit}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg md:text-xl text-gray-200">

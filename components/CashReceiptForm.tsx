@@ -27,14 +27,14 @@ export default function CashReceiptForm({
   defaultAmount = 500,
   existingData,
 }: CashReceiptFormProps) {
-  const [formData, setFormData] = useState<CashReceiptFormData>({
+  const [formData, setFormData] = useState<CashReceiptFormData>(() => ({
     receiptNumber: existingData?.receiptNumber || `CR-${Date.now()}`,
     receiptDate: existingData?.receiptDate || new Date().toISOString().split('T')[0],
     amount: existingData?.amount || defaultAmount,
     receivedBy: existingData?.receivedBy || '',
     notes: existingData?.notes || '',
     paymentMethod: existingData?.paymentMethod || 'Cash',
-  });
+  }));
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 

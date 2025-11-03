@@ -25,12 +25,12 @@ export default function NewMaintenanceTicket() {
   const { createTicket, residentData, isLoading } = useData();
   const [isSaving, setIsSaving] = useState(false);
   
-  // Resident contact info (autopopulated)
-  const [residentInfo, setResidentInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    unit: '',
+  // Resident contact info (autopopulated from context)
+  const [residentInfo] = useState({
+    name: residentData?.name || '',
+    email: residentData?.email || '',
+    phone: residentData?.phone || '',
+    unit: residentData?.unit || '',
   });
   
   const [formData, setFormData] = useState({
@@ -38,23 +38,9 @@ export default function NewMaintenanceTicket() {
     category: 'Plumbing' as MaintenanceCategory,
     priority: 'Medium' as MaintenancePriority,
     description: '',
-    location: '',
+    location: residentData?.unit || '',
     photos: [] as string[],
   });
-
-  // Set resident info from context when available
-  useEffect(() => {
-  if (residentData) {
-  setResidentInfo({
-  name: residentData.name,
-  email: residentData.email,
-  phone: residentData.phone,
-  unit: residentData.unit,
-  });
-  // Set default location to unit
-  setFormData(prev => ({ ...prev, location: residentData.unit }));
-  }
-  }, [residentData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +107,7 @@ export default function NewMaintenanceTicket() {
         title="New Maintenance Ticket" 
         subtitle="Report a maintenance issue"
         icon={Wrench}
-        color="teal"
+        color="blue"
         showBackButton
         backUrl="/resident/maintenance"
       />
@@ -133,9 +119,9 @@ export default function NewMaintenanceTicket() {
             <form onSubmit={handleSubmit} className="space-y-8">
               
               {/* Contact Information Section (Read-Only) */}
-              <div className="bg-gray-900 border-2 border-teal-500 rounded-2xl p-8 shadow-xl">
+              <div className="bg-gray-900 border-2 border-blue-500 rounded-2xl p-8 shadow-xl">
                 <h3 className="text-white font-bold text-2xl sm:text-3xl md:text-4xl mb-8 flex items-center gap-4">
-                  <User className="w-10 h-10 text-teal-400" />
+                  <User className="w-10 h-10 text-blue-400" />
                   Your Contact Information
                 </h3>
                 
@@ -143,7 +129,7 @@ export default function NewMaintenanceTicket() {
                   
                   {/* Name */}
                   <div>
-                    <label className="block text-teal-400 font-bold mb-4 text-xl sm:text-2xl flex items-center gap-3">
+                    <label className="block text-blue-400 font-bold mb-4 text-xl sm:text-2xl flex items-center gap-3">
                       <User className="w-7 h-7" />
                       Full Name
                     </label>
@@ -198,7 +184,7 @@ export default function NewMaintenanceTicket() {
                   value={formData.title}
                   onChange={(e) => updateFormData('title', e.target.value)}
                   placeholder="e.g., Kitchen sink is leaking"
-                  className="w-full px-6 py-6 bg-gray-900 text-white rounded-xl border-2 border-gray-600 focus:border-teal-500 focus:outline-none text-xl sm:text-2xl md:text-3xl placeholder:text-gray-500"
+                  className="w-full px-6 py-6 bg-gray-900 text-white rounded-xl border-2 border-gray-600 focus:border-blue-500 focus:outline-none text-xl sm:text-2xl md:text-3xl placeholder:text-gray-500"
                   required
                 />
               </div>
@@ -214,7 +200,7 @@ export default function NewMaintenanceTicket() {
                   <select
                     value={formData.category}
                     onChange={(e) => updateFormData('category', e.target.value as MaintenanceCategory)}
-                    className="w-full px-6 py-6 bg-gray-900 text-white rounded-xl border-2 border-gray-600 focus:border-teal-500 focus:outline-none text-xl sm:text-2xl md:text-3xl"
+                    className="w-full px-6 py-6 bg-gray-900 text-white rounded-xl border-2 border-gray-600 focus:border-blue-500 focus:outline-none text-xl sm:text-2xl md:text-3xl"
                     required
                   >
                     <option value="Plumbing">Plumbing</option>
@@ -287,7 +273,7 @@ export default function NewMaintenanceTicket() {
                 <label className="block text-white font-bold mb-4 text-xl sm:text-2xl md:text-3xl">
                   Photos (Optional)
                 </label>
-                <div className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-teal-500 transition-all cursor-pointer">
+                <div className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-blue-500 transition-all cursor-pointer">
                   <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-300 text-lg sm:text-xl md:text-2xl mb-2">
                     Click to upload photos
@@ -327,7 +313,7 @@ export default function NewMaintenanceTicket() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 inline-flex items-center justify-center gap-3 px-8 py-6 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-bold hover:from-teal-500 hover:to-teal-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xl sm:text-2xl md:text-3xl"
+                  className="flex-1 inline-flex items-center justify-center gap-3 px-8 py-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold hover:from-blue-500 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xl sm:text-2xl md:text-3xl"
                 >
                   <Save className="w-8 h-8" />
                   {isSaving ? 'Creating...' : 'Create Ticket'}

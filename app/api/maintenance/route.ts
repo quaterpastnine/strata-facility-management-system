@@ -4,7 +4,7 @@ import { getAllTickets, createTicket, updateTicket } from '@/lib/serverData';
 export async function GET() {
   try {
     const tickets = getAllTickets();
-    return NextResponse.json(tickets);
+    return NextResponse.json({ tickets });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 });
   }

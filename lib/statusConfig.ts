@@ -62,6 +62,26 @@ export const MOVE_STATUS_CONFIG: Record<MoveStatus, {
     color: 'bg-green-500/20 text-green-300 border-green-500',
     label: 'Approved'
   },
+  'Deposit Pending': {
+    icon: Clock,
+    color: 'bg-orange-500/20 text-orange-300 border-orange-500',
+    label: 'Deposit Pending'
+  },
+  'Payment Claimed': {
+    icon: AlertCircle,
+    color: 'bg-purple-500/20 text-purple-300 border-purple-500',
+    label: 'Payment Claimed'
+  },
+  'Deposit Verified': {
+    icon: CheckCircle,
+    color: 'bg-teal-500/20 text-teal-300 border-teal-500',
+    label: 'Deposit Verified'
+  },
+  'Fully Approved': {
+    icon: CheckCircle,
+    color: 'bg-green-600/20 text-green-300 border-green-600',
+    label: 'Fully Approved'
+  },
   'In Progress': {
     icon: AlertCircle,
     color: 'bg-blue-500/20 text-blue-300 border-blue-500',

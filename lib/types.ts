@@ -88,9 +88,21 @@ export interface ActivityItem {
 
 // Move In/Out Types
 export type MoveType = 'Move In' | 'Move Out';
-export type MoveStatus = 'Pending' | 'Approved' | 'Rejected' | 'In Progress' | 'Completed' | 'Cancelled';
+export type MoveStatus = 
+  | 'Pending'              // Initial submission
+  | 'Approved'             // FM approved, deposit instructions sent
+  | 'Deposit Pending'      // Awaiting resident payment
+  | 'Payment Claimed'      // Resident claims payment made
+  | 'Deposit Verified'     // FM verified payment received
+  | 'Fully Approved'       // All steps complete, ready for move
+  | 'Rejected'
+  | 'In Progress'
+  | 'Completed'
+  | 'Cancelled';
 export type LoadingDock = 'Dock 1' | 'Dock 2';
 export type MovingCompanyType = 'Professional' | 'Self-Move' | 'Family/Friends';
+export type DepositPaymentMethod = 'bank' | 'cash';
+export type DepositStatus = 'awaiting_instructions' | 'pending' | 'awaiting_payment' | 'claimed' | 'payment_claimed' | 'verified';
 
 export interface MoveRequest {
   id: string;
@@ -119,13 +131,27 @@ export interface MoveRequest {
   movingCompanyPhone?: string;
   movingCompanyInsurance?: boolean;
   
-  // Insurance & Deposit
-  hasInsurance: boolean;
+  // Insurance & Deposit (Original fields - hasInsurance deprecated, use movingCompanyInsurance)
+  hasInsurance?: boolean; // DEPRECATED - use movingCompanyInsurance
   insuranceProvider?: string;
   insurancePolicyNumber?: string;
   depositAmount: number;
   depositPaid: boolean;
   depositRefundAccount?: string;
+  
+  // NEW: Enhanced Deposit Workflow
+  depositPaymentMethod?: DepositPaymentMethod; // FM sets: 'bank' or 'cash'
+  depositBankDetails?: string; // FM enters bank details if method is 'bank'
+  depositCashAppointmentDate?: string; // FM sets appointment date if method is 'cash'
+  depositPaidDate?: string; // Date resident claims payment was made
+  depositProofUrl?: string; // Required if payment method is 'bank' (EFT proof)
+  depositStatus?: DepositStatus; // Track deposit workflow stage
+  depositVerifiedBy?: string; // FM name who verified payment
+  depositVerifiedDate?: string; // Date FM verified payment received
+  
+  // NEW: Insurance Selection (Required Step)
+  insuranceSelected?: boolean; // true=YES, false=NO, undefined=not yet selected
+  insuranceSelectionDate?: string; // When resident made selection
   
   // Cash Receipt (for manual payments)
   cashReceiptNumber?: string;
@@ -192,4 +218,63 @@ export interface FacilityBooking {
   // Approval
   approvedBy?: string;
   cancellationReason?: string;
+}
+
+// Cash Receipt Types (Phase 3B)
+export interface CashReceipt {
+  id: string;
+  receiptNumber: string;          // CR-YYYYMMDD-###
+  moveRequestId: string;
+  date: string;                   // ISO date
+  amount: number;
+  paymentMethod: 'Cash';
+  receivedBy: string;             // FM name
+  receivedDate: string;
+  notes?: string;
+  printedCopies: number;
+  residentCopyGiven: boolean;
+  fileCopyStored: boolean;
+  residentName: string;
+  residentUnit: string;
+  residentSignature?: string;     // Could be image URL
+  fmSignature?: string;           // Could be image URL
+  createdAt: string;
+  createdBy: string;
+}
+
+// Damage Assessment Types (Phase 7)
+export interface DamageItem {
+  id: string;
+  location: string;               // "Elevator", "Wall - 3rd Floor", etc.
+  description: string;
+  estimatedCost: number;
+  photoUrls: string[];
+}
+
+export interface DamageAssessment {
+  id: string;
+  moveRequestId: string;
+  assessedBy: string;             // FM name
+  assessedDate: string;
+  damageFound: boolean;
+  damageItems: DamageItem[];
+  totalCost: number;
+  photos: string[];               // URLs
+  notes: string;
+}
+
+// Refund Processing Types (Phase 8)
+export interface RefundRecord {
+  id: string;
+  moveRequestId: string;
+  depositAmount: number;
+  damageDeductions: number;
+  refundAmount: number;
+  refundMethod: 'cash' | 'eft' | 'card';
+  processedBy: string;
+  processedDate: string;
+  bankReference?: string;
+  notes?: string;
+  residentNotified: boolean;
+  status: 'pending' | 'processed' | 'failed';
 }

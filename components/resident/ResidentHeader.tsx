@@ -63,8 +63,14 @@ export function ResidentHeader({
           {actions}
 
           <div className="flex items-center gap-4 pl-6 ml-6 border-l border-cyan-500/30">
-            <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-              <span className="text-white font-bold text-lg">{residentData?.initials || 'JD'}</span>
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-cyan-400">
+              <Image
+                src="/willow.jpg"
+                alt="Resident Avatar"
+                width={56}
+                height={56}
+                className="object-cover w-full h-full"
+              />
             </div>
             <div className="text-right">
               <div className="font-semibold text-white text-lg">{residentData?.name || 'Loading...'}</div>
@@ -72,15 +78,24 @@ export function ResidentHeader({
             </div>
           </div>
 
-          <button className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all">
+          <button 
+            onClick={() => router.push('/')}
+            className="inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all"
+          >
             <LogOut className="h-5 w-5" />
             Logout
           </button>
         </div>
 
         <div className="md:hidden">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-            <span className="text-white font-bold text-sm sm:text-base">{residentData?.initials || 'JD'}</span>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-cyan-400">
+            <Image
+              src="/willow.jpg"
+              alt="Resident Avatar"
+              width={48}
+              height={48}
+              className="object-cover w-full h-full"
+            />
           </div>
         </div>
       </div>
@@ -96,8 +111,14 @@ export function ResidentHeader({
           </button>
 
           <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-lg">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center border-2 border-cyan-400">
-              <span className="text-white font-bold text-sm">{residentData?.initials || 'JD'}</span>
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-cyan-400">
+              <Image
+                src="/willow.jpg"
+                alt="Resident Avatar"
+                width={40}
+                height={40}
+                className="object-cover w-full h-full"
+              />
             </div>
             <div>
               <div className="font-semibold text-white text-base">{residentData?.name || 'Loading...'}</div>
@@ -105,7 +126,10 @@ export function ResidentHeader({
             </div>
           </div>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all">
+          <button 
+            onClick={() => router.push('/')}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium border-2 border-red-500 text-red-400 bg-transparent hover:bg-red-500 hover:text-white transition-all"
+          >
             <LogOut className="h-5 w-5" />
             Logout
           </button>

@@ -98,8 +98,8 @@ let tickets: MaintenanceTicket[] = [
 
 // ==================== MOVE REQUESTS ====================
 // Multiple scenarios demonstrating different stages of the move process
-let moveRequests: MoveRequest[] = [
-  // SCENARIO 1: Completed Move with Full Refund
+const moveRequests: MoveRequest[] = [
+  // SCENARIO 1: Completed Move with Full Refund - Bank Transfer Payment
   {
     id: 'MOVE-001',
     moveType: 'Move In',
@@ -125,23 +125,20 @@ let moveRequests: MoveRequest[] = [
     movingCompanyType: 'Professional',
     movingCompanyName: 'Swift Movers Ltd',
     movingCompanyPhone: '(555) 123-4567',
-    movingCompanyInsurance: true,
+    movingCompanyInsurance: true, // ✅ YES - company has insurance
     
-    // Insurance & Deposit
-    hasInsurance: true,
-    insuranceProvider: 'InsureAll',
-    insurancePolicyNumber: 'POL-2024-567890',
+    // ✨ NEW: Deposit Payment Method
+    depositPaymentMethod: 'bank', // Resident chose bank transfer
     depositAmount: 500,
     depositPaid: true,
-    depositRefundAccount: '062-548-123456789',
+    depositPaidDate: '2024-11-16',
+    depositProofUrl: '/uploads/proof-move-001.pdf', // Bank transfer proof
+    depositStatus: 'verified',
+    depositVerifiedBy: 'Sarah Johnson',
+    depositVerifiedDate: '2024-11-16',
     
-    // Cash Receipt (Manager recorded payment)
-    cashReceiptNumber: 'CR-20241115-001',
-    cashReceiptDate: '2024-11-15',
-    cashReceiptAmount: 500,
-    cashReceiptReceivedBy: 'Sarah Johnson',
-    cashReceiptNotes: 'Paid in full, cash counted together with resident',
-    paymentMethod: 'Cash',
+    // Refund Details (for Move Out only - but keeping structure)
+    depositRefundAccount: undefined,
     
     // Building Access
     accessCardsNeeded: 3,
@@ -163,13 +160,17 @@ let moveRequests: MoveRequest[] = [
     // Timestamps
     submittedDate: '2024-11-15',
     completedDate: '2024-11-28',
+    
+    // REMOVED OLD FIELDS:
+    // hasInsurance, insuranceProvider, insurancePolicyNumber
+    // cashReceiptNumber, cashReceiptDate, paymentMethod (those are for cash only)
   },
   
-  // SCENARIO 2: Approved - Awaiting Payment
+  // SCENARIO 2: Payment Claimed - Ready for Cash Receipt
   {
     id: 'MOVE-002',
     moveType: 'Move Out',
-    status: 'Approved',
+    status: 'Payment Claimed', // ⚠️ Resident confirmed payment, FM needs to record cash receipt
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
     residentEmail: 'willow.legg@example.com',
@@ -191,17 +192,21 @@ let moveRequests: MoveRequest[] = [
     movingCompanyType: 'Professional',
     movingCompanyName: 'Elite Moving Services',
     movingCompanyPhone: '(555) 234-5678',
-    movingCompanyInsurance: true,
+    movingCompanyInsurance: true, // ✅ YES - company has insurance
     
-    // Insurance & Deposit - PAYMENT PENDING
-    hasInsurance: true,
-    insuranceProvider: 'SafeMove Insurance',
-    insurancePolicyNumber: 'SM-2025-001234',
+    // ✨ NEW: Deposit Payment Method - CASH SELECTED
+    depositPaymentMethod: 'cash', // Resident chose cash payment
     depositAmount: 500,
-    depositPaid: false, // ⚠️ NOT YET PAID - Manager needs to record payment
-    depositRefundAccount: '062-548-987654321', // Bank details provided for refund
+    depositPaid: false, // ⚠️ Claimed but not yet verified by FM
+    depositPaidDate: '2025-01-03', // Date resident claimed they paid
+    depositCashAppointmentDate: '2025-01-05', // FM scheduled appointment
+    depositBankDetails: undefined, // Not needed for cash
+    depositStatus: 'claimed',
     
-    // Cash Receipt - EMPTY (waiting for manager to record)
+    // Refund Details (Move Out - where deposit refund will go)
+    depositRefundAccount: 'Account Name: Willow Legg\nBank: Standard Bank\nAccount Number: 062-548-987654321\nBranch Code: 051001',
+    
+    // Cash Receipt - Will be created when resident pays
     cashReceiptNumber: undefined,
     cashReceiptDate: undefined,
     cashReceiptAmount: undefined,
@@ -228,13 +233,16 @@ let moveRequests: MoveRequest[] = [
     
     // Timestamps
     submittedDate: '2024-12-20',
+    
+    // REMOVED OLD FIELDS:
+    // hasInsurance, insuranceProvider, insurancePolicyNumber
   },
   
-  // SCENARIO 3: Pending Approval
+  // SCENARIO 3: Pending Approval - Self-Move, No Insurance
   {
     id: 'MOVE-003',
     moveType: 'Move In',
-    status: 'Pending',
+    status: 'Pending', // ⚠️ Awaiting FM approval
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
     residentEmail: 'willow.legg@example.com',
@@ -256,23 +264,14 @@ let moveRequests: MoveRequest[] = [
     movingCompanyType: 'Family/Friends',
     movingCompanyName: undefined,
     movingCompanyPhone: undefined,
-    movingCompanyInsurance: false,
+    movingCompanyInsurance: false, // ⚠️ NO insurance (self-move)
     
-    // Insurance & Deposit
-    hasInsurance: false,
-    insuranceProvider: undefined,
-    insurancePolicyNumber: undefined,
+    // ✨ NEW: Deposit Payment Method - BANK SELECTED
+    depositPaymentMethod: 'bank', // Resident chose bank transfer
     depositAmount: 500,
-    depositPaid: false,
-    depositRefundAccount: '',
-    
-    // Cash Receipt - EMPTY (request not approved yet)
-    cashReceiptNumber: undefined,
-    cashReceiptDate: undefined,
-    cashReceiptAmount: undefined,
-    cashReceiptReceivedBy: undefined,
-    cashReceiptNotes: undefined,
-    paymentMethod: undefined,
+    depositPaid: false, // Not paid yet (pending approval first)
+    depositStatus: 'awaiting_instructions', // Waiting for FM approval
+    depositRefundAccount: undefined,
     
     // Building Access
     accessCardsNeeded: 2,
@@ -293,13 +292,16 @@ let moveRequests: MoveRequest[] = [
     
     // Timestamps
     submittedDate: '2024-12-28',
+    
+    // REMOVED OLD FIELDS:
+    // hasInsurance, insuranceProvider, insurancePolicyNumber
   },
   
-  // SCENARIO 4: In Progress (Move Day)
+  // SCENARIO 4: In Progress (Move Day) - Bank Transfer, Verified Payment
   {
     id: 'MOVE-004',
     moveType: 'Move In',
-    status: 'In Progress',
+    status: 'In Progress', // 🚚 Moving happening NOW
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
     residentEmail: 'willow.legg@example.com',
@@ -321,23 +323,18 @@ let moveRequests: MoveRequest[] = [
     movingCompanyType: 'Professional',
     movingCompanyName: 'QuickMove Pro',
     movingCompanyPhone: '(555) 345-6789',
-    movingCompanyInsurance: true,
+    movingCompanyInsurance: true, // ✅ YES - company has insurance
     
-    // Insurance & Deposit
-    hasInsurance: true,
-    insuranceProvider: 'MoveSafe Insurance',
-    insurancePolicyNumber: 'MS-2024-999888',
+    // ✨ NEW: Deposit Payment Method - BANK TRANSFER, VERIFIED
+    depositPaymentMethod: 'bank', // Resident chose bank transfer
     depositAmount: 500,
-    depositPaid: true,
-    depositRefundAccount: '062-548-111222333',
-    
-    // Cash Receipt (Paid via EFT)
-    cashReceiptNumber: 'CR-20241222-005',
-    cashReceiptDate: '2024-12-22',
-    cashReceiptAmount: 500,
-    cashReceiptReceivedBy: 'Sarah Johnson',
-    cashReceiptNotes: 'Payment received via bank transfer, confirmed in account',
-    paymentMethod: 'EFT',
+    depositPaid: true, // ✅ PAID AND VERIFIED
+    depositPaidDate: '2024-12-22',
+    depositProofUrl: '/uploads/proof-move-004.pdf', // Bank transfer proof uploaded
+    depositStatus: 'verified',
+    depositVerifiedBy: 'Sarah Johnson',
+    depositVerifiedDate: '2024-12-23',
+    depositRefundAccount: undefined,
     
     // Building Access
     accessCardsNeeded: 5,
@@ -358,20 +355,24 @@ let moveRequests: MoveRequest[] = [
     
     // Timestamps
     submittedDate: '2024-12-18',
+    
+    // REMOVED OLD FIELDS:
+    // hasInsurance, insuranceProvider, insurancePolicyNumber
+    // cashReceiptNumber, cashReceiptDate (not used for bank transfer)
   },
   
-  // SCENARIO 5: Rejected Request
+  // SCENARIO 5: Rejected Request - Holiday Move
   {
     id: 'MOVE-005',
     moveType: 'Move Out',
-    status: 'Rejected',
+    status: 'Rejected', // ❌ Rejected by FM
     residentName: 'Willow Legg',
     residentUnit: 'Unit 111',
     residentEmail: 'willow.legg@example.com',
     residentPhone: '(555) 987-6543',
     
     // Move Details
-    moveDate: '2024-12-25', // Christmas Day
+    moveDate: '2024-12-25', // Christmas Day - not allowed
     startTime: '09:00',
     endTime: '15:00',
     estimatedDuration: 6,
@@ -386,23 +387,14 @@ let moveRequests: MoveRequest[] = [
     movingCompanyType: 'Self-Move',
     movingCompanyName: undefined,
     movingCompanyPhone: undefined,
-    movingCompanyInsurance: false,
+    movingCompanyInsurance: false, // ⚠️ NO insurance (self-move)
     
-    // Insurance & Deposit
-    hasInsurance: false,
-    insuranceProvider: undefined,
-    insurancePolicyNumber: undefined,
+    // ✨ NEW: Deposit Payment Method - CASH SELECTED (but rejected before payment)
+    depositPaymentMethod: 'cash', // Resident chose cash
     depositAmount: 500,
-    depositPaid: false,
-    depositRefundAccount: '062-548-444555666',
-    
-    // Cash Receipt - EMPTY (request rejected)
-    cashReceiptNumber: undefined,
-    cashReceiptDate: undefined,
-    cashReceiptAmount: undefined,
-    cashReceiptReceivedBy: undefined,
-    cashReceiptNotes: undefined,
-    paymentMethod: undefined,
+    depositPaid: false, // Never paid (request rejected)
+    depositStatus: undefined, // No status (rejected before approval)
+    depositRefundAccount: 'Account Name: Willow Legg\nBank: Standard Bank\nAccount Number: 062-548-444555666\nBranch Code: 051001',
     
     // Building Access
     accessCardsNeeded: 2,
@@ -424,11 +416,15 @@ let moveRequests: MoveRequest[] = [
     
     // Timestamps
     submittedDate: '2024-12-10',
+    
+    // REMOVED OLD FIELDS:
+    // hasInsurance, insuranceProvider, insurancePolicyNumber
+    // cashReceiptNumber, cashReceiptDate (never created - request rejected)
   },
 ];
 
 // ==================== FACILITY BOOKINGS ====================
-let facilityBookings: FacilityBooking[] = [
+const facilityBookings: FacilityBooking[] = [
   {
     id: 'BOOK-001',
     facilityName: 'Tennis Court 1',

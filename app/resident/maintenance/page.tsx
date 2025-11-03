@@ -86,13 +86,13 @@ function MaintenanceContent() {
         title="Maintenance Requests" 
         subtitle="Submit and track maintenance tickets"
         icon={Wrench}
-        color="teal"
+        color="green"
         showBackButton
         backUrl="/resident"
         actions={
           <button
             onClick={() => router.push('/resident/maintenance/new')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-500 transition-all text-lg shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-500 transition-all text-lg shadow-lg"
           >
             <Plus className="w-6 h-6" />
             New Ticket
@@ -119,7 +119,7 @@ function MaintenanceContent() {
               value={stats.open}
               subtitle="Acknowledged"
               icon={AlertCircle}
-              gradient="bg-gradient-to-br from-blue-500 to-blue-600"
+              gradient="bg-gradient-to-br from-emerald-500 to-emerald-600"
             />
           </div>
           <div onClick={() => setFilterStatus('In Progress')} className="cursor-pointer">
@@ -146,7 +146,7 @@ function MaintenanceContent() {
               value={stats.total}
               subtitle="All time"
               icon={Wrench}
-              gradient="bg-gradient-to-br from-teal-500 to-teal-600"
+              gradient="bg-gradient-to-br from-blue-500 to-blue-600"
             />
           </div>
         </div>
@@ -180,7 +180,7 @@ function MaintenanceContent() {
                 <div
                   key={ticket.id}
                   onClick={() => handleTicketClick(ticket)}
-                  className="bg-gray-800 rounded-xl p-6 border-2 border-gray-600 hover:border-teal-500 hover:bg-gray-700 transition-all cursor-pointer active:scale-[0.99] shadow-xl"
+                  className="bg-gray-800 rounded-xl p-6 border-2 border-gray-600 hover:border-emerald-500 hover:bg-gray-700 transition-all cursor-pointer active:scale-[0.99] shadow-xl"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4">
                     <div className="flex-1 min-w-0">
@@ -266,7 +266,7 @@ function MaintenanceContent() {
                   
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 border-t-2 border-gray-600">
                     <span className="text-lg md:text-xl text-gray-300 font-bold">Ticket #{ticket.id}</span>
-                    <button className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded-lg text-lg md:text-xl font-bold flex items-center gap-2 transition-all">
+                    <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg text-lg md:text-xl font-bold flex items-center gap-2 transition-all">
                       View Details
                       <ChevronRight className="w-6 h-6" />
                     </button>

@@ -3,12 +3,10 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { FMHeader } from '@/components/fm/FMHeader';
-import { useData } from '@/contexts/DataContext';
 import { 
-  Calendar,
+  Truck,
   ChevronLeft,
   ChevronRight,
-  Wrench,
   Clock,
   CheckCircle,
   XCircle,
@@ -16,94 +14,96 @@ import {
   AlertCircle,
   Filter,
   Search,
-  Download,
-  TrendingUp
+  Calendar,
+  MapPin,
+  DollarSign,
+  User,
+  Download
 } from 'lucide-react';
+import { useData } from '@/contexts/DataContext';
+import { type MoveRequest } from '@/lib/types';
 
-// Types matching serverData
-interface MaintenanceRequest {
-  id: string;
-  title: string;
-  location: string;
-  category: string;
-  priority: string;
-  status: string;
-  description: string;
-  dateSubmitted: string;
-  assignedTo?: string;
-  residentName: string;
-  residentUnit: string;
-}
-
-// Status configuration
+// Status configuration for calendar
 const statusConfig = {
-  'Open': {
-    label: 'Urgent',
-    color: 'bg-red-500',
-    lightColor: 'bg-red-100',
-    textColor: 'text-red-700',
-    borderColor: 'border-red-300',
-    icon: AlertCircle,
-    gradient: 'from-red-500 to-red-600'
-  },
-  'In Progress': {
-    label: 'In Progress',
+  'Pending': {
     color: 'bg-yellow-500',
     lightColor: 'bg-yellow-100',
     textColor: 'text-yellow-700',
     borderColor: 'border-yellow-300',
-    icon: PlayCircle,
-    gradient: 'from-yellow-500 to-yellow-600'
+    icon: AlertCircle
   },
-  'Pending': {
-    label: 'Pending',
+  'Approved': {
     color: 'bg-blue-500',
     lightColor: 'bg-blue-100',
     textColor: 'text-blue-700',
     borderColor: 'border-blue-300',
-    icon: Clock,
-    gradient: 'from-blue-500 to-blue-600'
+    icon: CheckCircle
   },
-  'Completed': {
-    label: 'Completed',
+  'Deposit Pending': {
+    color: 'bg-orange-500',
+    lightColor: 'bg-orange-100',
+    textColor: 'text-orange-700',
+    borderColor: 'border-orange-300',
+    icon: Clock
+  },
+  'Payment Claimed': {
+    color: 'bg-purple-500',
+    lightColor: 'bg-purple-100',
+    textColor: 'text-purple-700',
+    borderColor: 'border-purple-300',
+    icon: DollarSign
+  },
+  'Deposit Verified': {
+    color: 'bg-teal-500',
+    lightColor: 'bg-teal-100',
+    textColor: 'text-teal-700',
+    borderColor: 'border-teal-300',
+    icon: CheckCircle
+  },
+  'Fully Approved': {
     color: 'bg-green-500',
     lightColor: 'bg-green-100',
     textColor: 'text-green-700',
     borderColor: 'border-green-300',
-    icon: CheckCircle,
-    gradient: 'from-green-500 to-green-600'
+    icon: CheckCircle
+  },
+  'In Progress': {
+    color: 'bg-blue-600',
+    lightColor: 'bg-blue-100',
+    textColor: 'text-blue-700',
+    borderColor: 'border-blue-300',
+    icon: PlayCircle
+  },
+  'Completed': {
+    color: 'bg-green-600',
+    lightColor: 'bg-green-100',
+    textColor: 'text-green-700',
+    borderColor: 'border-green-300',
+    icon: CheckCircle
   },
   'Rejected': {
-    label: 'Rejected',
-    color: 'bg-gray-500',
-    lightColor: 'bg-gray-100',
-    textColor: 'text-gray-700',
-    borderColor: 'border-gray-300',
-    icon: XCircle,
-    gradient: 'from-gray-500 to-gray-600'
+    color: 'bg-red-500',
+    lightColor: 'bg-red-100',
+    textColor: 'text-red-700',
+    borderColor: 'border-red-300',
+    icon: XCircle
   },
   'Cancelled': {
-    label: 'Cancelled',
     color: 'bg-gray-500',
     lightColor: 'bg-gray-100',
     textColor: 'text-gray-700',
     borderColor: 'border-gray-300',
-    icon: XCircle,
-    gradient: 'from-gray-500 to-gray-600'
+    icon: XCircle
   }
 };
 
-export default function MaintenanceCalendarDashboard() {
+export default function FMMoveRequestsList() {
   const router = useRouter();
-  const { tickets, isLoading } = useData();
+  const { moveRequests, isLoading } = useData();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
-
-  // Use tickets directly from DataContext
-  const maintenanceData = tickets;
 
   // Generate calendar days for current month
   const calendarDays = useMemo(() => {
@@ -127,34 +127,33 @@ export default function MaintenanceCalendarDashboard() {
     return days;
   }, [selectedDate]);
 
-  // Filter maintenance requests
+  // Filter move requests
   const filteredRequests = useMemo(() => {
-    return maintenanceData.filter(request => {
+    return moveRequests.filter(request => {
       const matchesStatus = selectedStatus === 'all' || request.status === selectedStatus;
-      const matchesPriority = selectedPriority === 'all' || request.priority.toLowerCase() === selectedPriority;
       const matchesSearch = searchQuery === '' || 
-        request.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.residentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         request.residentUnit.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        request.residentName.toLowerCase().includes(searchQuery.toLowerCase());
+        request.moveType.toLowerCase().includes(searchQuery.toLowerCase());
       
-      return matchesStatus && matchesPriority && matchesSearch;
+      return matchesStatus && matchesSearch;
     });
-  }, [maintenanceData, selectedStatus, selectedPriority, searchQuery]);
+  }, [moveRequests, selectedStatus, searchQuery]);
 
   // Get requests for a specific date
   const getRequestsForDate = (date: Date | null) => {
     if (!date) return [];
     const dateStr = date.toISOString().split('T')[0];
-    return filteredRequests.filter(req => req.dateSubmitted === dateStr);
+    return filteredRequests.filter(req => req.moveDate === dateStr);
   };
 
   // Calculate statistics
   const stats = useMemo(() => {
     return {
       total: filteredRequests.length,
-      open: filteredRequests.filter(r => r.status === 'Open').length,
-      inProgress: filteredRequests.filter(r => r.status === 'In Progress').length,
       pending: filteredRequests.filter(r => r.status === 'Pending').length,
+      approved: filteredRequests.filter(r => r.status === 'Approved' || r.status === 'Deposit Pending').length,
+      inProgress: filteredRequests.filter(r => r.status === 'In Progress').length,
       completed: filteredRequests.filter(r => r.status === 'Completed').length
     };
   }, [filteredRequests]);
@@ -176,12 +175,31 @@ export default function MaintenanceCalendarDashboard() {
   
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Pending': return 'bg-yellow-500';
+      case 'Approved': return 'bg-blue-500';
+      case 'Deposit Pending': return 'bg-orange-500';
+      case 'Payment Claimed': return 'bg-purple-500';
+      case 'Deposit Verified': return 'bg-teal-500';
+      case 'Fully Approved': return 'bg-green-500';
+      case 'In Progress': return 'bg-blue-600';
+      case 'Completed': return 'bg-green-600';
+      case 'Rejected': return 'bg-red-500';
+      case 'Cancelled': return 'bg-gray-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <FMHeader currentPage="Maintenance" />
+        <FMHeader currentPage="Move Requests" />
         <div className="flex items-center justify-center h-96">
-          <div className="text-white text-2xl">Loading maintenance data...</div>
+          <div className="text-center">
+            <div className="animate-spin w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading move requests...</p>
+          </div>
         </div>
       </div>
     );
@@ -201,16 +219,14 @@ export default function MaintenanceCalendarDashboard() {
       
       {/* Content */}
       <div className="relative z-10">
-        <FMHeader currentPage="Maintenance" />
-      
-
+        <FMHeader currentPage="Move Requests" />
 
       {/* Page Header with Stats */}
-      <div className="bg-gradient-to-r from-cyan-600 via-cyan-700 to-teal-700 py-6 px-8 shadow-lg">
+      <div className="bg-gradient-to-r from-purple-700 via-purple-800 to-pink-700 py-6 px-8 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Maintenance Request Calendar</h2>
-            <p className="text-white text-base drop-shadow">Track and manage all maintenance requests</p>
+            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Move In/Out Requests</h2>
+            <p className="text-white text-base drop-shadow">Track and manage all move requests</p>
           </div>
         </div>
 
@@ -219,42 +235,42 @@ export default function MaintenanceCalendarDashboard() {
           <div className="bg-white/25 backdrop-blur-sm rounded-xl p-4 border border-white/40 hover:bg-white/35 transition-all cursor-pointer group">
             <div className="flex items-center justify-between mb-2">
               <p className="text-white font-semibold drop-shadow">Total Requests</p>
-              <Wrench className="w-6 h-6 text-white drop-shadow group-hover:rotate-12 transition-transform" />
+              <Truck className="w-6 h-6 text-white drop-shadow group-hover:rotate-12 transition-transform" />
             </div>
             <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.total}</p>
           </div>
 
           <div 
-            onClick={() => setSelectedStatus('Open')}
-            className="bg-red-600/30 backdrop-blur-sm rounded-xl p-4 border border-red-400/50 hover:bg-red-600/40 transition-all cursor-pointer group"
+            onClick={() => setSelectedStatus('Pending')}
+            className="bg-yellow-600/30 backdrop-blur-sm rounded-xl p-4 border border-yellow-400/50 hover:bg-yellow-600/40 transition-all cursor-pointer group"
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-white font-semibold drop-shadow">Open</p>
+              <p className="text-white font-semibold drop-shadow">Pending</p>
               <AlertCircle className="w-6 h-6 text-white drop-shadow group-hover:animate-pulse" />
             </div>
-            <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.open}</p>
+            <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.pending}</p>
+          </div>
+
+          <div 
+            onClick={() => setSelectedStatus('Approved')}
+            className="bg-blue-600/30 backdrop-blur-sm rounded-xl p-4 border border-blue-400/50 hover:bg-blue-600/40 transition-all cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-white font-semibold drop-shadow">Approved</p>
+              <CheckCircle className="w-6 h-6 text-white drop-shadow group-hover:scale-110 transition-transform" />
+            </div>
+            <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.approved}</p>
           </div>
 
           <div 
             onClick={() => setSelectedStatus('In Progress')}
-            className="bg-yellow-600/30 backdrop-blur-sm rounded-xl p-4 border border-yellow-400/50 hover:bg-yellow-600/40 transition-all cursor-pointer group"
+            className="bg-cyan-600/30 backdrop-blur-sm rounded-xl p-4 border border-cyan-400/50 hover:bg-cyan-600/40 transition-all cursor-pointer group"
           >
             <div className="flex items-center justify-between mb-2">
               <p className="text-white font-semibold drop-shadow">In Progress</p>
               <PlayCircle className="w-6 h-6 text-white drop-shadow group-hover:animate-spin" />
             </div>
             <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.inProgress}</p>
-          </div>
-
-          <div 
-            onClick={() => setSelectedStatus('Pending')}
-            className="bg-blue-600/30 backdrop-blur-sm rounded-xl p-4 border border-blue-400/50 hover:bg-blue-600/40 transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-white font-semibold drop-shadow">Pending</p>
-              <Clock className="w-6 h-6 text-white drop-shadow group-hover:animate-bounce" />
-            </div>
-            <p className="text-white text-4xl font-bold drop-shadow-lg">{stats.pending}</p>
           </div>
 
           <div 
@@ -275,7 +291,7 @@ export default function MaintenanceCalendarDashboard() {
         
         {/* Filters and Search Bar */}
         <div className="bg-gray-800 rounded-xl p-6 mb-6 border border-gray-700 shadow-xl">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -286,7 +302,7 @@ export default function MaintenanceCalendarDashboard() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title, unit, or reporter..."
+                placeholder="Search by name, unit, or move type..."
                 className="w-full h-12 px-4 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
@@ -302,27 +318,11 @@ export default function MaintenanceCalendarDashboard() {
                 className="w-full h-12 px-4 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
               >
                 <option value="all">All Statuses</option>
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
                 <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Deposit Pending">Deposit Pending</option>
+                <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                <TrendingUp className="inline w-4 h-4 mr-2" />
-                Priority Filter
-              </label>
-              <select
-                value={selectedPriority}
-                onChange={(e) => setSelectedPriority(e.target.value)}
-                className="w-full h-12 px-4 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              >
-                <option value="all">All Priorities</option>
-                <option value="high">High Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="low">Low Priority</option>
               </select>
             </div>
           </div>
@@ -420,18 +420,23 @@ export default function MaintenanceCalendarDashboard() {
                       <div className="space-y-1">
                         {requests.slice(0, 3).map(request => {
                           const config = statusConfig[request.status as keyof typeof statusConfig];
-                          const Icon = config.icon;
+                          const Icon = config?.icon || Truck;
                           
                           return (
                             <div
                               key={request.id}
-                              className={`p-2 rounded text-xs font-medium ${config.lightColor} ${config.textColor} border ${config.borderColor} hover:scale-105 transition-all animate-fade-in`}
-                              title={`${request.title} - ${request.residentUnit}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/facilitiesmanager/move-requests/${request.id}`);
+                              }}
+                              className={`p-2 rounded text-xs font-medium ${config?.lightColor || 'bg-gray-100'} ${config?.textColor || 'text-gray-700'} border ${config?.borderColor || 'border-gray-300'} hover:scale-105 transition-all animate-fade-in`}
+                              title={`${request.moveType} - ${request.residentUnit}`}
                             >
                               <div className="flex items-center gap-1">
                                 <Icon className="w-3 h-3 flex-shrink-0" />
-                                <span className="truncate">{request.title}</span>
+                                <span className="truncate">{request.moveType}</span>
                               </div>
+                              <div className="text-[10px] opacity-75 truncate">{request.residentUnit}</div>
                             </div>
                           );
                         })}
@@ -451,98 +456,69 @@ export default function MaintenanceCalendarDashboard() {
         ) : (
           <>
             {/* List View */}
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-xl">
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Wrench className="w-6 h-6 text-cyan-400" />
-                All Maintenance Requests ({filteredRequests.length})
-              </h3>
-
-              <div className="space-y-4">
-                {filteredRequests.map(request => {
-                  const config = statusConfig[request.status as keyof typeof statusConfig];
-                  const Icon = config.icon;
-
-                  return (
-                    <div
-                      key={request.id}
-                      className="bg-gray-900 rounded-lg p-6 border-l-4 hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02] animate-fade-in"
-                      style={{ borderLeftColor: config.color.replace('bg-', '') }}
-                    >
-                      <div className="flex items-start justify-between">
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-3">
-                            <span className="text-cyan-400 font-mono font-bold text-lg">{request.id}</span>
-                            <h4 className="text-white text-xl font-bold group-hover:text-cyan-400 transition-colors">
-                              {request.title}
-                            </h4>
+            <div className="space-y-4">
+              {filteredRequests.length === 0 ? (
+                <div className="bg-gray-800 rounded-xl p-12 text-center border border-gray-700">
+                  <Truck className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-400 text-lg">No move requests found</p>
+                </div>
+              ) : (
+                filteredRequests.map((request) => (
+                  <div
+                    key={request.id}
+                    onClick={() => router.push(`/facilitiesmanager/move-requests/${request.id}`)}
+                    className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-purple-500/50 hover:bg-gray-750 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <Truck className="w-6 h-6 text-white" />
                           </div>
-
-                          <div className="grid grid-cols-3 gap-4 mb-3">
-                            <div>
-                              <p className="text-gray-400 text-sm">Location</p>
-                              <p className="text-white font-semibold">{request.location}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-400 text-sm">Reported By</p>
-                              <p className="text-white font-semibold">{request.residentName}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-400 text-sm">Date Submitted</p>
-                              <p className="text-white font-semibold">{request.dateSubmitted}</p>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-4">
-                            <div>
-                              <p className="text-gray-400 text-sm">Category</p>
-                              <p className="text-cyan-400 font-semibold">{request.category}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-400 text-sm">Assigned To</p>
-                              <p className="text-white font-semibold">{request.assignedTo || 'Unassigned'}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-400 text-sm">Unit</p>
-                              <p className="text-white font-semibold">{request.residentUnit}</p>
-                            </div>
-                          </div>
-
-                          <p className="text-gray-300 mt-3 text-sm italic">"{request.description}"</p>
-                        </div>
-
-                        <div className="flex flex-col items-end gap-3">
-                          <div className={`px-6 py-3 rounded-xl bg-gradient-to-r ${config.gradient} text-white font-bold text-lg shadow-lg flex items-center gap-2`}>
-                            <Icon className="w-5 h-5" />
-                            {config.label}
-                          </div>
-
-                          <div className={`px-4 py-2 rounded-lg ${
-                            request.priority === 'High' 
-                              ? 'bg-red-500/20 text-red-300 border border-red-500/50' 
-                              : request.priority === 'Medium'
-                              ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/50'
-                              : 'bg-blue-500/20 text-blue-300 border border-blue-500/50'
-                          } font-semibold`}>
-                            {request.priority.toUpperCase()} Priority
+                          <div>
+                            <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
+                              {request.moveType} - {request.residentUnit}
+                            </h3>
+                            <p className="text-gray-400">{request.residentName}</p>
                           </div>
                         </div>
+
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div className="flex items-center gap-2 text-gray-300">
+                            <Calendar className="w-4 h-4 text-cyan-400" />
+                            <span>{new Date(request.moveDate).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-300">
+                            <Clock className="w-4 h-4 text-blue-400" />
+                            <span>{request.startTime} - {request.endTime}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-300">
+                            <MapPin className="w-4 h-4 text-green-400" />
+                            <span>{request.loadingDock}</span>
+                          </div>
+                        </div>
+
+                        {request.depositAmount && (
+                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-300">
+                            <DollarSign className="w-4 h-4 text-yellow-400" />
+                            <span>Deposit: R{request.depositAmount.toFixed(2)}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`${getStatusColor(request.status)} text-white px-4 py-2 rounded-lg font-bold text-sm`}>
+                          {request.status}
+                        </span>
+                        <p className="text-xs text-gray-500">#{request.id}</p>
                       </div>
                     </div>
-                  );
-                })}
-
-                {filteredRequests.length === 0 && (
-                  <div className="text-center py-12">
-                    <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400 text-xl">No maintenance requests found matching your filters</p>
                   </div>
-                )}
-              </div>
+                ))
+              )}
             </div>
           </>
         )}
-
       </div>
 
       <style jsx>{`
