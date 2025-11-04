@@ -134,7 +134,7 @@ const moveRequests: MoveRequest[] = [
     depositPaidDate: '2025-10-25',
     depositProofUrl: '/uploads/proof-move-001.pdf', // Bank transfer proof
     depositStatus: 'verified',
-    depositVerifiedBy: 'Sarah Johnson',
+    depositVerifiedBy: 'Andrew Mates',
     depositVerifiedDate: '2025-10-25',
     
     // Refund Details (for Move Out only - but keeping structure)
@@ -154,7 +154,7 @@ const moveRequests: MoveRequest[] = [
     termsAcceptedDate: '2025-10-20',
     
     // Approval
-    approvedBy: 'Facilities Manager - Sarah Johnson',
+    approvedBy: 'Facilities Manager - Andrew Mates',
     approvedDate: '2025-10-21',
     
     // Timestamps
@@ -228,7 +228,7 @@ const moveRequests: MoveRequest[] = [
     termsAcceptedDate: '2025-10-20',
     
     // Approval
-    approvedBy: 'Facilities Manager - Sarah Johnson',
+    approvedBy: 'Facilities Manager - Andrew Mates',
     approvedDate: '2025-10-21',
     
     // Timestamps
@@ -332,7 +332,7 @@ const moveRequests: MoveRequest[] = [
     depositPaidDate: '2025-10-22',
     depositProofUrl: '/uploads/proof-move-004.pdf', // Bank transfer proof uploaded
     depositStatus: 'verified',
-    depositVerifiedBy: 'Sarah Johnson',
+    depositVerifiedBy: 'Andrew Mates',
     depositVerifiedDate: '2025-10-23',
     depositRefundAccount: undefined,
     
@@ -350,7 +350,7 @@ const moveRequests: MoveRequest[] = [
     termsAcceptedDate: '2025-10-18',
     
     // Approval
-    approvedBy: 'Facilities Manager - Sarah Johnson',
+    approvedBy: 'Facilities Manager - Andrew Mates',
     approvedDate: '2025-10-19',
     
     // Timestamps
@@ -410,7 +410,7 @@ const moveRequests: MoveRequest[] = [
     termsAcceptedDate: '2025-10-10',
     
     // Approval
-    approvedBy: 'Facilities Manager - Sarah Johnson',
+    approvedBy: 'Facilities Manager - Andrew Mates',
     approvedDate: '2025-10-11',
     rejectionReason: 'Move requested on Day of Reconciliation (public holiday). Building closed. Please reschedule to Nov 26 or later.',
     
