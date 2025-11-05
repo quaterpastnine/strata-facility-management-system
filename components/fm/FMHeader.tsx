@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Home, LogOut, Menu, X, Wrench, Truck } from 'lucide-react';
+import { Home, LogOut, Menu, X, Wrench, Truck, MessageSquare } from 'lucide-react';
 
 interface FMHeaderProps {
   currentPage?: string;
@@ -86,6 +86,18 @@ export function FMHeader({
             Move Requests
           </button>
 
+          <button 
+            onClick={() => router.push('/facilitiesmanager/communications')}
+            className={`inline-flex items-center gap-2 h-12 px-6 rounded-lg text-lg font-medium border-2 transition-all ${
+              currentPage === 'Communications'
+                ? 'border-emerald-500 bg-emerald-500 text-white'
+                : 'border-emerald-500 text-emerald-400 bg-transparent hover:bg-emerald-500 hover:text-white'
+            }`}
+          >
+            <MessageSquare className="h-5 w-5" />
+            Communications
+          </button>
+
           {actions}
 
           <div className="flex items-center gap-4 pl-6 ml-6 border-l border-orange-500/30">
@@ -152,6 +164,14 @@ export function FMHeader({
           >
             <Truck className="h-5 w-5" />
             Move Requests
+          </button>
+
+          <button 
+            onClick={() => router.push('/facilitiesmanager/communications')}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium border-2 border-emerald-500 text-emerald-400 bg-transparent hover:bg-emerald-500 hover:text-white transition-all"
+          >
+            <MessageSquare className="h-5 w-5" />
+            Communications
           </button>
 
           <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-lg">

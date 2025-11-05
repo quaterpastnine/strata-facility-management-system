@@ -14,7 +14,8 @@ import {
   Filter,
   Search,
   Download,
-  TrendingUp
+  TrendingUp,
+  Plus
 } from 'lucide-react';
 
 // Types matching serverData
@@ -163,6 +164,16 @@ export default function MaintenanceCalendarDashboard() {
             <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Maintenance Requests</h2>
             <p className="text-white text-base drop-shadow">Track and manage all maintenance requests</p>
           </div>
+          
+          <button
+            onClick={() => router.push('/facilitiesmanager/maintenance/new')}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-lg font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-lg hover:shadow-emerald-500/50 transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="hidden lg:inline">Create New Maintenance Ticket</span>
+            <span className="hidden sm:inline lg:hidden">Create Ticket</span>
+            <span className="sm:hidden">Create</span>
+          </button>
         </div>
 
         {/* Quick Stats */}
